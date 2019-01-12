@@ -2,8 +2,12 @@ var express    = require("express"),
     app        = express(),
     bodyParser = require("body-parser"),
     mongoose   = require("mongoose"),
-    Place      = require("./models/place");
+    Place      = require("./models/place"),
+    Comment    = require("./models/comment"),
+    seedDB     = require("./seeds");
 
+
+seedDB();
 mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: true });
 
 
@@ -24,7 +28,7 @@ app.get("/:city/places", function(req, res){
             console.log(err);
         }
         else {
-            res.render("places", {places: places, city:city, cityCap:cityCap});
+            res.render("places/places", {places: places, city:city, cityCap:cityCap});
         }
     })
 });
@@ -54,28 +58,59 @@ app.post("/:city/places", function(req, res){
 app.get("/:city/places/new", function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city)
-    res.render("new", {city:city, cityCap: cityCap});
+    res.render("places/new", {city:city, cityCap: cityCap});
 
 });
 
 app.get("/:city/places/:id", function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city)
-    Place.findById(req.params.id, function(err, place){
+    Place.findById(req.params.id).populate("comments").exec(function(err, place){
         if(err){
             console.log(err);
         }
         else{
-            res.render("show", {place: place});
+            res.render("places/show", {place: place});
         }
     });
+});
 
+app.get("/:city/places/:id/comments/new", function(req, res){
+    
+    Place.findById(req.params.id, function(err, place){
+        if(err){
+            console.log(err);
+        }
+        else {
+            res.render("comments/new", {place: place});
+        }
+    });
+});
 
+app.post("/:city/places/:id/comments", function(req, res){
+    Place.findById(req.params.id, function(err, place){
+        if(err){
+            console.log(err);
+            res.redirect("/:city/places");
+        }
+        else {
+            Comment.create(req.body.comment, function(err, comment){
+                if(err){
+                    console.log(err);
+                }
+                else {
+                    place.comments.push(comment);
+                    place.save();
+                    console.log(place.city + "/places/")
+                    res.redirect("/" + place.city + "/places");
+                }    
+            });
+        }
+    });
 });
 
 
-
-app.listen(3000, 'localhost', function(){
+app.listen(3001, 'localhost', function(){
     console.log('Course project app has started!');
 });
 
