@@ -1,2 +1,4 @@
-seeds
+seeds.js
 mongod
+node_modules/
+.vscode

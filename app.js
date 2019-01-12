@@ -4,9 +4,14 @@ var express       = require("express"),
     mongoose      = require("mongoose"),
     passport      = require("passport"),
     localStrategy = require("passport-local"),
+    
     Place         = require("./models/place"),
     Comment       = require("./models/comment"),
     User          = require("./models/user"),
+
+    // placeRoutes   = require("./routes/places"),
+    // commentRoutes = require("./routes/places"),
+    // authRoutes    = require("./routes/places"),
     seedDB        = require("./seeds");
 
 
@@ -33,6 +38,12 @@ app.get("/", function(req, res){
     
     res.render("landing", {currentUser: req.user});
 });
+
+
+
+
+
+// CAMPGROUND ROUTES
 
 app.get("/:city/places", function(req, res){
 
@@ -94,6 +105,10 @@ app.get("/:city/places/:id", function(req, res){
     });
 });
 
+
+
+// COMMENT ROUTES
+
 app.get("/:city/places/:id/comments/new", isLoggedIn, function(req, res){
     
     Place.findById(req.params.id, function(err, place){
@@ -127,6 +142,12 @@ app.post("/:city/places/:id/comments", isLoggedIn, function(req, res){
         }
     });
 });
+
+
+
+
+
+
 
 //AUTH ROUTES
 
@@ -187,7 +208,10 @@ app.get("/logout", function(req, res){
 
 
 
-app.listen(3001, 'localhost', function(){
+
+
+
+app.listen(3000, 'localhost', function(){
     console.log('Course project app has started!');
 });
 
