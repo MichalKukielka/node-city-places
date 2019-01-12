@@ -162,7 +162,7 @@ app.post("/login", passport.authenticate("local",
     {
         successRedirect: "/",
         failureRedirect: "/login"
-    }), function(req, res){
+    }), function(req, res){ });
 
 app.get("/:city/places/:id/comments/new", function(req, res){
     
@@ -181,7 +181,7 @@ app.get("/:city/places/:id/comments/new", function(req, res){
 app.get("/logout", function(req, res){
     req.logout();
     res.redirect("/");
-})
+});
 
 
 
@@ -199,8 +199,7 @@ function isLoggedIn(req, res, next){
 };
 
 
-function toTitleCase(string)
-{
+function toTitleCase(string){
     // \u00C0-\u00ff for a happy Latin-1
     return string.toLowerCase().replace(/_/g, ' ').replace(/\b([a-z\u00C0-\u00ff])/g, function (_, initial) {
         return initial.toUpperCase();
