@@ -44,7 +44,9 @@ app.get("/:city/places", function(req, res){
             console.log(err);
         }
         else {
+
             res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+
         }
     })
 });
@@ -74,6 +76,7 @@ app.post("/:city/places", function(req, res){
 app.get("/:city/places/new", function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city)
+
     res.render("places/new", {city:city, cityCap: cityCap, currentUser: req.user});
 
 });
@@ -161,7 +164,16 @@ app.post("/login", passport.authenticate("local",
         failureRedirect: "/login"
     }), function(req, res){
 
-
+app.get("/:city/places/:id/comments/new", function(req, res){
+    
+    Place.findById(req.params.id, function(err, place){
+        if(err){
+            console.log(err);
+        }
+        else {
+            res.render("comments/new", {place: place});
+        }
+    });
 });
 
 // LOGOUT LOGIC ROUTE
