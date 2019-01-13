@@ -28,6 +28,9 @@ router.post("/:city/places/:id/comments", isLoggedIn, function (req, res) {
                     console.log(err);
                 }
                 else {
+                    comment.author.id = req.user._id;
+                    comment.author.username = req.user.username;
+                    comment.save();
                     place.comments.push(comment);
                     place.save();
                     res.redirect("/" + place.city + "/places");

@@ -13,10 +13,10 @@ var express       = require("express"),
 
 var placeRoutes   = require("./routes/places"),
     commentRoutes = require("./routes/comments"),
-    indexRoutes    = require("./routes/index");
+    indexRoutes   = require("./routes/index");
     
 
-seedDB();
+// seedDB();
 mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: true });
 
 

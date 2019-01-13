@@ -19,18 +19,25 @@ router.get("/:city/places", function(req, res){
     })
 });
 
-router.post("/:city/places", function(req, res){
+router.post("/:city/places", isLoggedIn, function(req, res){
 
     var city = req.params.city;
     var name = req.body.name;
     var image = req.body.image;
     var description = req.body.description;
+    var author = {
+        id: req.user._id,
+        username: req.user.username
+    };
+
     var newPlace = {
         city: city, 
         name: name, 
         image: image,
-        description: description};
-
+        description: description,
+        author: author
+    };
+    
     Place.create(newPlace, function(err, place){
         if(err){
             console.log(err);
@@ -41,7 +48,7 @@ router.post("/:city/places", function(req, res){
     });
 });
 
-router.get("/:city/places/new", function(req, res){
+router.get("/:city/places/new", isLoggedIn, function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city)
 
@@ -71,5 +78,11 @@ function toTitleCase(string){
         return match.toLowerCase();
     });
 }
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+};
 
 module.exports = router

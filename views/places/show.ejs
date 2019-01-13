@@ -17,6 +17,7 @@
                         <img class="card-img-top" src="<%= place.image %>">
                         <div class="card-body">
                             <h2 class="card-title text-primary"><%= place.name %></h2>
+                            <h6 class="card-text">Submitted by <%= place.author.username %></h6>
                             <p class="card-text text-justify"><%= place.description %></p>
                         </div>
                     </div>
@@ -31,7 +32,7 @@
                             <% place.comments.forEach(function(comment){ %>
                                 <div class="card border-light mb-3">
                                     <div class="card-body text-dark">
-                                        <h5 class="card-title mb-4 d-inline"><%= comment.author %></h5>
+                                        <h5 class="card-title mb-4 d-inline"><%= comment.author.username %></h5>
                                         <p class="card-text d-inline float-right"><small class="text-muted">Added 4 mins ago</small></p>
                                         <p class="card-text text-justify"><%= comment.text  %></p>
                                     </div>
