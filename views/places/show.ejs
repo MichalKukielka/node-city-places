@@ -32,9 +32,9 @@
                             <% place.comments.forEach(function(comment){ %>
                                 <div class="card border-light mb-3">
                                     <div class="card-body text-dark">
-                                        <h5 class="card-title mb-4 d-inline"><%= comment %></h5>
+                                        <h5 class="card-title mb-4 d-inline"><%= comment.author.username %></h5>
                                         <p class="card-text d-inline float-right"><small class="text-muted">Added 4 mins ago</small></p>
-                                        <p class="card-text text-justify"><%= comment.text %> MEME </p>
+                                        <p class="card-text text-justify"><%= comment.text  %></p>
                                     </div>
                                 </div>
                             <% }) %>                     

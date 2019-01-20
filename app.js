@@ -14,13 +14,14 @@ var express       = require("express"),
 var placeRoutes   = require("./routes/places"),
     commentRoutes = require("./routes/comments"),
     indexRoutes   = require("./routes/index");
+    
 
 // seedDB();
 mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: true });
 
 
 app.set("view engine", "ejs");
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(require("express-session")({
     secret: "vfdsagjadfklgvadsfgbadfbdvpjmgbvzcjnxm`;Di3243tgqsradv90zhione;jkfavxc",
     resave: false,
