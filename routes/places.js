@@ -5,7 +5,7 @@ var express = require("express"),
 router.get("/:city/places", function(req, res){
 
     var city = req.params.city;
-    var cityCap = toTitleCase(city)
+    var cityCap = toTitleCase(city);
 
     Place.find({"city": city}, function(err, places){
         if(err){
@@ -50,25 +50,61 @@ router.post("/:city/places", isLoggedIn, function(req, res){
 
 router.get("/:city/places/new", isLoggedIn, function(req, res){
     var city = req.params.city;
-    var cityCap = toTitleCase(city)
+    var cityCap = toTitleCase(city);
 
-    res.render("places/new", {city:city, cityCap: cityCap, currentUser: req.user});
+    res.render("places/new", {city:city, cityCap: cityCap});
 
 });
 
 router.get("/:city/places/:id", function(req, res){
     var city = req.params.city;
-    var cityCap = toTitleCase(city)
     Place.findById(req.params.id).populate("comments").exec(function(err, place){
         if(err){
             console.log(err);
         }
         else{
-            res.render("places/show", {place: place, currentUser: req.user});
+            res.render("places/show", {place: place,});
         }
     });
 });
 
+// EDIT PLACE ROUTE
+router.get("/:city/places/:id/edit", checkPlaceOwnership, function(req, res){
+
+    Place.findById(req.params.id, function(err, place){
+        
+        if(err){
+            console.log(err)
+        } else {
+            res.render("places/edit", {place: place});
+        }
+
+    });
+
+});
+
+// UPDATE PLACE ROUTE
+router.put("/:city/places/:id", checkPlaceOwnership, function(req, res){
+    Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
+        if(err){
+            res.redirect("/" + updatedPlace.city + "/places");
+        } else {
+            res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
+        }
+    });
+});
+
+// DESTROY PLACE ROUTE
+router.delete("/:city/places/:id", checkPlaceOwnership, function(req, res){
+    city = req.params.city
+    Place.findByIdAndRemove(req.params.id, function(err, place){
+        if (err) {
+            res.redirect("/" + city + "/places");
+        } else {
+            res.redirect("/" + city + "/places");
+        }
+    });
+});
 
 function toTitleCase(string){
     // \u00C0-\u00ff for a happy Latin-1
@@ -84,5 +120,28 @@ function isLoggedIn(req, res, next) {
     }
     res.redirect("/login");
 };
+
+function checkPlaceOwnership(req, res, next){
+
+    if(req.isAuthenticated()){
+        Place.findById(req.params.id, function(err, place){
+            if(err){
+                res.redirect("/" + place.city + "/places");
+            } else {
+
+                if(place.author.id.equals(req.user._id)){
+                    next();
+                } else {
+                    res.redirect("back");
+                }
+                
+            }
+        });
+    
+    } else { 
+        res.redirect("back");
+    }
+
+}
 
 module.exports = router

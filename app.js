@@ -4,7 +4,9 @@ var express       = require("express"),
     mongoose      = require("mongoose"),
     passport      = require("passport"),
     localStrategy = require("passport-local"),
-    
+    methodOverride = require("method-override"),
+
+
     Place         = require("./models/place"),
     Comment       = require("./models/comment"),
     User          = require("./models/user"),
@@ -22,6 +24,9 @@ mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: tru
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
+
 app.use(require("express-session")({
     secret: "vfdsagjadfklgvadsfgbadfbdvpjmgbvzcjnxm`;Di3243tgqsradv90zhione;jkfavxc",
     resave: false,

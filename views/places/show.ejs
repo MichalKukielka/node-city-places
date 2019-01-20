@@ -18,6 +18,17 @@
                         <div class="card-body">
                             <h2 class="card-title text-primary"><%= place.name %></h2>
                             <h6 class="card-text">Submitted by <%= place.author.username %></h6>
+                            
+                            
+                            <% if(currentUser && place.author.id.equals(currentUser._id)) { %>
+
+                                <a class="btn btn-outline-warning d-inline mr-1 btn-sm btn-block" href="<%= place._id %>/edit" >Edit</a>
+                                <form class="d-inline" action="<%= place._id %>/?_method=DELETE" method="POST">
+                                    <button type="submit" class="btn btn-outline-danger d-inline mr-3 btn-sm ">Delete</button>
+                                </form>
+
+                            <% } %>
+
                             <p class="card-text text-justify"><%= place.description %></p>
                         </div>
                     </div>
