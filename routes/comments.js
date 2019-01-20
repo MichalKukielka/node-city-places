@@ -33,6 +33,7 @@ router.post("/:city/places/:id/comments", isLoggedIn, function (req, res) {
                     comment.save();
                     place.comments.push(comment);
                     place.save();
+                    console.log(comment)
                     res.redirect("/" + place.city + "/places");
                 }
             });
