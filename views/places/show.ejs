@@ -45,10 +45,15 @@
                                     <div class="card-body text-dark">
                                         <h5 class="card-title mb-4 d-inline"><%= comment.author.username %></h5>
                                         <p class="card-text d-inline float-right"><small class="text-muted">Added 4 mins ago</small></p>
-                                        <a class="btn btn-sm btn-outline-warning" href="<%= place._id %>/comments/<%= comment._id %>/edit">Edit</a>
-                                        <form class="d-inline" action="<%= place._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
-                                            <button type="submit" class="btn btn-outline-danger d-inline mr-3 btn-sm ">Delete</button>
-                                        </form>
+
+                                        <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
+
+                                            <a class="btn btn-sm btn-outline-warning" href="<%= place._id %>/comments/<%= comment._id %>/edit">Edit</a>
+                                            <form class="d-inline" action="<%= place._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
+                                                <button type="submit" class="btn btn-outline-danger d-inline mr-3 btn-sm ">Delete</button>
+                                            </form>
+
+                                        <% } %>
                                         <p class="card-text text-justify"><%= comment.text  %></p>
                                     </div>
                                 </div>
