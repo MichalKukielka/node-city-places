@@ -1,6 +1,8 @@
-var express = require("express"),
-    router  = express.Router(),
-    Place   = require("../models/place");
+var express    = require("express"),
+    router     = express.Router(),
+    middleware = require('../middleware/index'),
+    Place      = require("../models/place");
+
 
 router.get("/:city/places", function(req, res){
 
@@ -19,7 +21,7 @@ router.get("/:city/places", function(req, res){
     })
 });
 
-router.post("/:city/places", isLoggedIn, function(req, res){
+router.post("/:city/places", middleware.isLoggedIn, function(req, res){
 
     var city = req.params.city;
     var name = req.body.name;
@@ -48,10 +50,11 @@ router.post("/:city/places", isLoggedIn, function(req, res){
     });
 });
 
-router.get("/:city/places/new", isLoggedIn, function(req, res){
+router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city);
-
+    
+    req.flash("error", "You need to be logged in to do that.")
     res.render("places/new", {city:city, cityCap: cityCap});
 
 });
@@ -69,7 +72,7 @@ router.get("/:city/places/:id", function(req, res){
 });
 
 // EDIT PLACE ROUTE
-router.get("/:city/places/:id/edit", checkPlaceOwnership, function(req, res){
+router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, function(req, res){
 
     Place.findById(req.params.id, function(err, place){
         
@@ -84,7 +87,7 @@ router.get("/:city/places/:id/edit", checkPlaceOwnership, function(req, res){
 });
 
 // UPDATE PLACE ROUTE
-router.put("/:city/places/:id", checkPlaceOwnership, function(req, res){
+router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
     Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
         if(err){
             res.redirect("/" + updatedPlace.city + "/places");
@@ -95,7 +98,7 @@ router.put("/:city/places/:id", checkPlaceOwnership, function(req, res){
 });
 
 // DESTROY PLACE ROUTE
-router.delete("/:city/places/:id", checkPlaceOwnership, function(req, res){
+router.delete("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
     city = req.params.city
     Place.findByIdAndRemove(req.params.id, function(err, place){
         if (err) {
@@ -114,34 +117,6 @@ function toTitleCase(string){
         return match.toLowerCase();
     });
 }
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-};
 
-function checkPlaceOwnership(req, res, next){
-
-    if(req.isAuthenticated()){
-        Place.findById(req.params.id, function(err, place){
-            if(err){
-                res.redirect("/" + place.city + "/places");
-            } else {
-
-                if(place.author.id.equals(req.user._id)){
-                    next();
-                } else {
-                    res.redirect("back");
-                }
-                
-            }
-        });
-    
-    } else { 
-        res.redirect("back");
-    }
-
-}
 
 module.exports = router

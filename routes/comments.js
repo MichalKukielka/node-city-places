@@ -1,10 +1,11 @@
-var express = require("express"),
-    router  = express.Router(),
-    Place   = require("../models/place"),
-    Comment   = require("../models/comment");
+var express    = require("express"),
+    router     = express.Router(),
+    middleware = require('../middleware/index'),
+    Place      = require("../models/place"),
+    Comment    = require("../models/comment");
 
 
-router.get("/:city/places/:id/comments/new", isLoggedIn, function (req, res) {
+router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (req, res) {
 
     Place.findById(req.params.id, function (err, place) {
         if (err) {
@@ -16,10 +17,12 @@ router.get("/:city/places/:id/comments/new", isLoggedIn, function (req, res) {
     });
 });
 
-router.post("/:city/places/:id/comments", isLoggedIn, function (req, res) {
+
+router.post("/:city/places/:id/comments", middleware.isLoggedIn, function (req, res) {
     Place.findById(req.params.id, function (err, place) {
         if (err) {
             console.log(err);
+            req.flash("error", "Something went wrong.");
             res.redirect("/:city/places");
         }
         else {
@@ -33,6 +36,7 @@ router.post("/:city/places/:id/comments", isLoggedIn, function (req, res) {
                     comment.save();
                     place.comments.push(comment);
                     place.save();
+                    req.flash("success", "Successfully added comment.");
                     res.redirect("/" + place.city + "/places");
                 }
             });
@@ -40,7 +44,7 @@ router.post("/:city/places/:id/comments", isLoggedIn, function (req, res) {
     });
 });
 
-router.get("/:city/places/:id/comments/:comment_id/edit", checkCommentOwnership, function(req, res){
+router.get("/:city/places/:id/comments/:comment_id/edit", middleware.checkCommentOwnership, function(req, res){
             
     Comment.findById(req.params.comment_id, function(err, comment){
         if (err) {
@@ -53,60 +57,32 @@ router.get("/:city/places/:id/comments/:comment_id/edit", checkCommentOwnership,
 
 });
 
-router.put("/:city/places/:id/comments/:comment_id", checkCommentOwnership, function(req, res){
+router.put("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership, function(req, res){
 
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
         if (err) {
             res.redirect("back")
         } else {
+            req.flash("success", "Comment deleted.");
             res.redirect("/" + req.params.city + "/places/" + req.params.id)
         }
     });
 
 });
 
-router.delete("/:city/places/:id/comments/:comment_id", checkCommentOwnership, function(req, res){
+router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership, function(req, res){
 
     Comment.findByIdAndRemove(req.params.comment_id, function(err){
         if (err) {
             res.redirect("back")
         } else {
+            
             res.redirect("/" + req.params.city + "/places/" + req.params.id)
         }
     });
 
 });
 
-function isLoggedIn(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    }
-    res.redirect("/login");
-};
-
-
-function checkCommentOwnership(req, res, next){
-
-    if(req.isAuthenticated()){
-        Comment.findById(req.params.comment_id, function(err, comment){
-            if(err){
-                res.redirect("back");
-            } else {
-
-                if(comment.author.id.equals(req.user._id)){
-                    next();
-                } else {
-                    res.redirect("back");
-                }
-                
-            }
-        });
-    
-    } else { 
-        res.redirect("back");
-    }
-
-}
 
 
 module.exports = router
