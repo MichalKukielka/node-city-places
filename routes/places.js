@@ -1,8 +1,17 @@
-var express    = require("express"),
-    router     = express.Router(),
-    middleware = require('../middleware/index'),
-    Place      = require("../models/place");
+var express      = require("express"),
+    router       = express.Router(),
+    middleware   = require('../middleware/index'),
+    Place        = require("../models/place"),
+    NodeGeocoder = require('node-geocoder');
 
+var options = {
+    provider: "google",
+    httpAdapter: 'https',
+    apiKey: process.env.GEOCODER_API_KEY,
+    formatter: null
+}
+
+var geocoder = NodeGeocoder(options)
 
 router.get("/:city/places", function(req, res){
 
@@ -32,22 +41,40 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
         username: req.user.username
     };
 
-    var newPlace = {
-        city: city, 
-        name: name, 
-        image: image,
-        description: description,
-        author: author
-    };
-    
-    Place.create(newPlace, function(err, place){
-        if(err){
-            console.log(err);
-        }
-        else {
-            res.redirect("/" + place.city + "/places")
-        }
+    geocoder.geocode(req.body.location, function(err, data){
+
+        if(err || !data.length) {
+            req.flash("error", "Invalid adress");
+            return res.redirect("back");
+        }   
+
+        var lat = data[0].latitude;
+        var lng = data[0].longitude;
+        var location = data[0].formattedAddress;
+
+
+        var newPlace = {
+            city: city, 
+            name: name, 
+            image: image,
+            description: description,
+            author: author,
+            lat: lat,
+            lng: lng,
+            location: location
+        };
+        
+        Place.create(newPlace, function(err, place){
+            if(err){
+                console.log(err);
+            }
+            else {
+                res.redirect("/" + place.city + "/places")
+            }
+        });
+
     });
+
 });
 
 router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
@@ -96,6 +123,59 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, re
         }
     });
 });
+
+router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
+
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+            req.flash('error', 'Invalid address.');
+            return res.redirect('back');
+        }
+        req.body.place.lat = data[0].latitude;
+        req.body.place.lng = data[0].longitude;
+        req.body.place.location = data[0].formattedAddress;
+    
+        Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
+            if(err){
+                req.flash("error", err.message + ".");
+                res.redirect("back");
+            } else {
+                req.flash("success","Successfully Updated!");
+                res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
+            }
+        });
+    });
+});
+
+
+
+
+//     geocoder.geocode(req.body.location, function(err, data){
+
+//         if(err || !data.length) {
+//             console.log(err)
+//             req.flash("error", "Invalid adress.");
+//             return res.redirect("back");
+//         }   
+
+//         req.body.place.lat = data[0].latitude;
+//         req.body.place.lng = data[0].longitude;
+//         req.body.place.location = data[0].formattedAddress;
+
+        
+//         Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
+//             if(err){
+//                 req.flash("error", err.message + ".");
+//                 res.redirect("/" + updatedPlace.city + "/places");
+//             } else {
+//                 req.flash("success", "Successfully Updated!");
+//                 res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
+//             }
+//         });
+
+//     });
+
+// });
 
 // DESTROY PLACE ROUTE
 router.delete("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){

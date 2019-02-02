@@ -3,6 +3,7 @@
     <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="/stylesheets/landing.css">
+        <link rel="stylesheet" href="/stylesheets/main.css">
 
         <title>CityPlaces - App</title>
     </head>
@@ -29,7 +30,7 @@
                             
                         <% } else { %>
                             <li class="nav-item">
-                                <a class="nav-link" href="/logout">Logout</a>
+                                <a class="nav-link" href="/logout">Logout <%= currentUser.username %></a>
                             </li>
                         <% } %>
                     
