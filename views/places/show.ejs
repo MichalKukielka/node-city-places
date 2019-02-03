@@ -1,10 +1,8 @@
 <% include ../partials/header %>
 
-    <div class="container">
 
         <div class="row">
             <div class="col-md-3">
-                <p class="lead text-center">Basic Info:</p>
                 <div id="map"></div>
             </div> 
             <div class="col-md-9">
@@ -13,18 +11,31 @@
                         <img class="card-img-top" src="<%= place.image %>">
                         <div class="card-body">
                             <h2 class="card-title text-primary"><%= place.name %></h2>
-                            <h6 class="card-text">Submitted by <%= place.author.username %></h6>
-                            <h6 class="card-text">Submitted by <%= place.location %></h6>
+
+                            <div class="row">
+                                <div class="col-6">
+                                    <h6 class="card-text float-left d-inline">Submitted by <a href="/users/<%= place.author.id %>"><%= place.author.username %></a>, <%= moment(place.createdAt).fromNow() %></h6>
+                                </div>
+                                <div class="col-6">
+                                    <% if(currentUser && place.author.id.equals(currentUser._id)) { %>
+                                        
+                                        <form class="d-inline float-right mb-3" action="<%= place._id %>/?_method=DELETE" method="POST">
+                                            <button type="submit" class=" btn text-danger d-inline ml-2 mr-0 pr-0 btn-sm" >Delete</button>
+                                        </form>
+
+
+                                        <a href="<%= place._id %>/edit" style="text-decoration: none" class="float-right">
+                                            <button href="<%= place._id %>/edit" class=" btn text-warning d-inline btn-sm">Edit</button>
+                                        </a>
+                                            
+                                        
+                                    <% } %>
+
+                                </div>
+                            </div>
                             
-                            <% if(currentUser && place.author.id.equals(currentUser._id)) { %>
-
-                                <a class="btn btn-outline-warning d-inline mr-1 btn-sm btn-block" href="<%= place._id %>/edit" >Edit</a>
-                                <form class="d-inline" action="<%= place._id %>/?_method=DELETE" method="POST">
-                                    <input type="submit" class="btn btn-outline-danger d-inline mr-3 btn-sm " value="Delete">
-                                </form>
-
-                            <% } %>
-
+                            
+                
                             <p class="card-text text-justify"><%= place.description %></p>
                         </div>
                     </div>
@@ -39,17 +50,33 @@
                             <% place.comments.forEach(function(comment){ %>
                                 <div class="card border-light mb-3">
                                     <div class="card-body text-dark">
-                                        <h5 class="card-title mb-4 d-inline"><%= comment.author.username %></h5>
-                                        <p class="card-text d-inline float-right"><small class="text-muted">Added 4 mins ago</small></p>
 
-                                        <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <h4 class="card-title d-inline float-left"><%= comment.author.username %></h4>
+                                                <p class="card-text d-inline float-left align-middle pl-3 pt-1"><small class="text-muted">Added <%= moment(comment.createdAt).fromNow() %>, </small>
+                                                <% if( comment.edited == true) { %>
+                                                    <small class="text-muted">Edited</small>
+                                                <% } %></p>
+                                            </div>
+                                            <div class="col-6">
 
-                                            <a class="btn btn-sm btn-outline-warning" href="<%= place._id %>/comments/<%= comment._id %>/edit">Edit</a>
-                                            <form class="d-inline" action="<%= place._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
-                                                <button type="submit" class="btn btn-outline-danger d-inline mr-3 btn-sm ">Delete</button>
-                                            </form>
 
-                                        <% } %>
+                                                    <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
+
+
+                                                        <form class="d-inline float-right" action="<%= place._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
+                                                            <button type="submit" class=" btn text-danger pr-0 ml-2 mr-0 btn-sm ">Delete</button>
+                                                        </form>
+                                                        <a class="" href="<%= place._id %>/comments/<%= comment._id %>/edit" style="text-decoration: none">
+                                                            <button href="<%= place._id %>/edit" class=" btn text-warning float-right btn-sm">Edit</button>
+                                                        </a>
+
+                                                    <% } %>
+
+                                            </div>
+                                        </div>                          
+
                                         <p class="card-text text-justify"><%= comment.text  %></p>
                                     </div>
                                 </div>
@@ -62,8 +89,6 @@
             </div> 
         </div> 
 
-
-    </div> 
 
 
     <script>

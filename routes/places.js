@@ -182,8 +182,10 @@ router.delete("/:city/places/:id", middleware.checkPlaceOwnership, function(req,
     city = req.params.city
     Place.findByIdAndRemove(req.params.id, function(err, place){
         if (err) {
+            req.flash("error", "Something went wrong.");
             res.redirect("/" + city + "/places");
         } else {
+            req.flash("warning", "Place deleted.");
             res.redirect("/" + city + "/places");
         }
     });

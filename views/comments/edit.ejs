@@ -11,8 +11,11 @@
                 <div class="form-group mt-1 mb-1">
                     <input class="form-control" type="text" name="comment[text]" value="<%= comment.text%>">
                 </div>
+
+                <input class="form-control" type="hidden" name="comment[edited]" value="true">
+
                 <div class="form-group mt-1 mb-1">
-                    <button type="submit" class="btn btn-lg btn-success mt-1 mb-2">Submit</button>
+                    <button type="submit" class="btn btn-outline-primary mt-1 mb-2">Submit</button>
                 </div>
             </form>
         </div>

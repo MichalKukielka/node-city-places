@@ -37,6 +37,7 @@ app.use(require("express-session")({
     saveUninitialized: false
 }));
 
+app.locals.moment = require('moment');
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
@@ -47,6 +48,7 @@ app.use(function(req, res, next){
     res.locals.currentUser = req.user;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
+    res.locals.warning = req.flash("warning");
     next();
 });
 

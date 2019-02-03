@@ -63,7 +63,7 @@ router.put("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwne
         if (err) {
             res.redirect("back")
         } else {
-            req.flash("success", "Comment deleted.");
+            req.flash("success", "Comment updated.");
             res.redirect("/" + req.params.city + "/places/" + req.params.id)
         }
     });
@@ -74,9 +74,10 @@ router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentO
 
     Comment.findByIdAndRemove(req.params.comment_id, function(err){
         if (err) {
+            req.flash("error", "Something went wrong.");
             res.redirect("back")
         } else {
-            
+            req.flash("warning", "Comment deleted.");
             res.redirect("/" + req.params.city + "/places/" + req.params.id)
         }
     });
