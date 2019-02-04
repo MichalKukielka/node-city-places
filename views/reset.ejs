@@ -1,0 +1,26 @@
+<% include partials/header %>
+
+<h3 class="text-center">Change Password</h3>
+
+<div class="row justify-content-center">
+    <div class="w-50 ">
+        <form action="/password/reset/<%= token %>" method="POST">
+
+            <div class="form-group">
+                <label for="usrnm">Password:</label>
+                <input class="form-control" id="em" type="password" name="password">
+            </div>
+
+            <div class="form-group">
+                <label for="usrnm">Re-Password:</label>
+                <input class="form-control" id="em" type="password" name="confirm">
+            </div>
+
+
+            <button type="submit" class="btn btn-outline-primary">Change Password</button>
+
+        </form>
+    </div>
+</div>
+
+<% include partials/footer %>g

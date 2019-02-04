@@ -1,0 +1,20 @@
+<% include partials/header %>
+
+<h3 class="text-center">Reset Password</h3>
+
+<div class="row justify-content-center">
+    <div class="w-50 ">
+        <form action="/password/reset" method="POST">
+
+            <div class="form-group">
+                <label for="usrnm">Email:</label>
+                <input class="form-control" id="em" type="text" name="email">
+            </div>
+
+            <button type="submit" class="btn btn-outline-primary">Reset Password</button>
+
+        </form>
+    </div>
+</div>
+
+<% include partials/footer %>g
