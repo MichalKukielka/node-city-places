@@ -19,16 +19,44 @@ router.get("/:city/places", function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city);
 
-    Place.find({"city": city}, function(err, places){
-        if(err){
-            console.log(err);
-        }
-        else {
+    if(req.query.search){
+    
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
 
-            res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+        Place.find({"city": city, "name": regex}, function(err, places){
+            if(err){
+                console.log(err);
+            }
+            else {
+                
+                if(places.length<=0){
+                    req.flash("warning", "No places matched");
+                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                }
+                else {
+                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                }
 
-        }
-    })
+            }
+        });
+
+    } else {
+        
+        Place.find({"city": city}, function(err, places){
+            if(err){
+                console.log(err);
+            }
+            else {
+
+                res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+
+            }
+        });
+
+    }
+
+
+
 });
 
 router.post("/:city/places", middleware.isLoggedIn, function(req, res){
@@ -144,13 +172,33 @@ router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, function(re
 
 // UPDATE PLACE ROUTE
 router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
-    Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
-        if(err){
-            res.redirect("/" + updatedPlace.city + "/places");
-        } else {
-            res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
-        }
+
+
+    geocoder.geocode(req.body.location, function(err, data){
+
+        if(err || !data.length) {
+            req.flash("error", "Invalid adress");
+            return res.redirect("back");
+        }   
+
+        var lat = data[0].latitude;
+        var lng = data[0].longitude;
+        var location = data[0].formattedAddress;
+
+        req.body.place.lat = lat;
+        req.body.place.lng = lng;
+        req.body.place.location = location;
+
+        Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
+            if(err){
+                res.redirect("/" + updatedPlace.city + "/places");
+            } else {
+                res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
+            }
+        });
+
     });
+
 });
 
 router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
@@ -228,6 +276,9 @@ function toTitleCase(string){
         return match.toLowerCase();
     });
 }
+function escapeRegex(text){
+    return text.replace(/[-[\]{}()*+?.,\\^$!#\s]/g, "\\$&")
+};
 
 
 module.exports = router

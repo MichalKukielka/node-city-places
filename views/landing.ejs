@@ -3,29 +3,31 @@
     <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="/stylesheets/landing.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
         <title>CityPlaces - App</title>
     </head>
     
     <body>
-
+        
 
         <div id="landing-header" class="justify-content-center">
             <h1 class="text-primary">Welcome to CityPlaces!</h1>
-            <div class="row">
-                <div class="col-md-5"></div>
-                <div class="col-md-2 pt-0 pb-4 justify-content-center">
+            <div class="row justify-content-center">
+                <div class="col-md-3 pt-0 pb-4 justify-content-center">
 
                     <form class="justify-content-center" action="/" method="POST">
-
-                    <div class="form-group">
-                        <input class="form-control bg-light" placeholder="Search a City" type="text" name="search">
-                    </div>
-        
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="More interesting cities"  aria-describedby="basic-addon2" name="search">
+                            <div class="input-group-append">
+                                <button class="btn btn-success" type="submit">
+                                    <i class="align-middle material-icons">search</i>
+                                </button>
+                            </div>
+                        </div>
                     </form>
-            </div>
+            
                 </div>
-                <div class="col-md-5"></div>
 
             </div>
         </div>
