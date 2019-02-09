@@ -17,6 +17,20 @@ router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (re
     });
 });
 
+router.get("/:city/places/:id/comments", middleware.isLoggedIn, function (req, res) {
+
+
+    Place.findById(req.params.id).populate("comments").exec(function(err, place){
+        if(err){
+            console.log(err);
+        }
+        else{
+            res.render("comments/commentsSection",{ place: place, currentUser: req.user });
+        }
+    });
+
+
+});
 
 router.post("/:city/places/:id/comments", middleware.isLoggedIn, function (req, res) {
     Place.findById(req.params.id, function (err, place) {
@@ -37,7 +51,7 @@ router.post("/:city/places/:id/comments", middleware.isLoggedIn, function (req, 
                     place.comments.push(comment);
                     place.save();
                     req.flash("success", "Successfully added comment.");
-                    res.redirect("/" + place.city + "/places");
+                    res.redirect("/" + place.city + "/places/" + place.id);
                 }
             });
         }
@@ -75,10 +89,10 @@ router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentO
     Comment.findByIdAndRemove(req.params.comment_id, function(err){
         if (err) {
             req.flash("error", "Something went wrong.");
-            res.redirect("back")
+            res.sendStatus(500);
         } else {
             req.flash("warning", "Comment deleted.");
-            res.redirect("/" + req.params.city + "/places/" + req.params.id)
+            res.sendStatus(200);
         }
     });
 

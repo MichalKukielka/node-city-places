@@ -1,6 +1,5 @@
 <% include ../partials/header %>
 
-
         <div class="row">
             <div class="col-md-3">
                 <div id="map"></div>
@@ -43,44 +42,19 @@
                     <div class="card border-light mb-3">
                         <div class="card-body text-dark">
                             <div class="card-title mb-4">  
-                                <h4 class="d-inline">Comments</h4> <a href="<%= place._id %>/comments/new" class="btn btn-outline-primary d-inline float-right">Add Review</a>
+                                <h4 class="d-inline">Comments</h4>
 
                             </div>
                             
-                            <% place.comments.forEach(function(comment){ %>
-                                <div class="card border-light mb-3">
-                                    <div class="card-body text-dark">
-
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <h4 class="card-title d-inline float-left"><%= comment.author.username %></h4>
-                                                <p class="card-text d-inline float-left align-middle pl-3 pt-1"><small class="text-muted">Added <%= moment(comment.createdAt).fromNow() %>, </small>
-                                                <% if( comment.edited == true) { %>
-                                                    <small class="text-muted">Edited</small>
-                                                <% } %></p>
-                                            </div>
-                                            <div class="col-6">
-
-
-                                                    <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
-
-
-                                                        <form class="d-inline float-right" action="<%= place._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
-                                                            <button type="submit" class=" btn text-danger pr-0 ml-2 mr-0 btn-sm ">Delete</button>
-                                                        </form>
-                                                        <a class="" href="<%= place._id %>/comments/<%= comment._id %>/edit" style="text-decoration: none">
-                                                            <button href="<%= place._id %>/edit" class=" btn text-warning float-right btn-sm">Edit</button>
-                                                        </a>
-
-                                                    <% } %>
-
-                                            </div>
-                                        </div>                          
-
-                                        <p class="card-text text-justify"><%= comment.text  %></p>
-                                    </div>
+                            <div id="commentsPlaceholder">
+                                
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="newComment" name="comment[text]" placeholder="New comment">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary" type="button" id="addCommentButton">Add</button> 
                                 </div>
-                            <% }) %>                     
+                            </div>                   
 
                         </div>
                     </div>
@@ -89,9 +63,51 @@
             </div> 
         </div> 
 
-
-
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
+
+        function loadComments() {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/comments',
+                type: 'GET',
+                dataType: 'html',
+                success: (data) => {
+                    document.getElementById("commentsPlaceholder").innerHTML = data;
+                }
+            });
+        }
+
+        function addCommentToDB() {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/newComment',
+                type: 'POST',
+                data: {'comment[text]' : $('#newComment').val()},
+                success: () => {
+                    loadComments();
+                }
+            });
+        }
+
+        function deleteComment(commentID) {
+            $.ajax({
+                url: '<%= place._id %>/comments/' + commentID + '%>/?_method=DELETE',
+                type: 'POST',
+                success: () => {
+                    loadComments();
+                }
+            });
+        }
+
+        $(document).ready(() => {
+
+            loadComments();
+
+            $('#addCommentButton').click(() => {
+                addCommentToDB();
+            });
+
+        });
+
                     function initMap() {
                         var lat = <%= place.lat %>;
                         var lng = <%= place.lng %>;
@@ -118,6 +134,6 @@
                         });
                     }
                 </script>
-                <script async defer src="https://maps.googleapis.com/maps/api/js?key=*********************************&callback=initMap"></script>
+                <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
 
 <% include ../partials/footer %>
