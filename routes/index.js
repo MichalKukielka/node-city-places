@@ -14,6 +14,11 @@ router.get("/", function(req, res){
     res.render("landing");
 });
 
+router.post("/", function(req, res){
+    res.redirect("/" + req.body.search.toLowerCase() + "/places")
+
+});
+
 //REGISTER FORM
 
 router.get("/register", function(req, res){
