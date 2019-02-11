@@ -14,7 +14,7 @@ var options = {
 
 var geocoder = NodeGeocoder(options)
 
-router.get("/:city/places", function(req, res){
+router.get("/:city/places/getPlaces", function(req, res){
 
     var city = req.params.city;
     var cityCap = toTitleCase(city);
@@ -31,10 +31,10 @@ router.get("/:city/places", function(req, res){
                 
                 if(places.length<=0){
                     req.flash("warning", "No places matched");
-                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
                 }
                 else {
-                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
                 }
 
             }
@@ -48,7 +48,7 @@ router.get("/:city/places", function(req, res){
             }
             else {
 
-                res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
 
             }
         });
@@ -57,6 +57,23 @@ router.get("/:city/places", function(req, res){
 
 
 
+});
+
+router.get("/:city/places", function(req, res){
+
+    var city = req.params.city;
+    var cityCap = toTitleCase(city);
+
+    Place.find({"city": city}, function(err, places){
+        if(err){
+            console.log(err);
+        }
+        else {
+
+            res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+
+        }
+    })
 });
 
 router.post("/:city/places", middleware.isLoggedIn, function(req, res){

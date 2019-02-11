@@ -18,16 +18,14 @@
                                 <div class="col-6">
                                     <% if(currentUser && place.author.id.equals(currentUser._id)) { %>
                                         
-                                        <form class="d-inline float-right mb-3" action="<%= place._id %>/?_method=DELETE" method="POST">
-                                            <button type="submit" class=" btn text-danger d-inline ml-2 mr-0 pr-0 btn-sm" >Delete</button>
-                                        </form>
-
-
-                                        <a href="<%= place._id %>/edit" style="text-decoration: none" class="float-right">
-                                            <button href="<%= place._id %>/edit" class=" btn text-warning d-inline btn-sm">Edit</button>
-                                        </a>
-                                            
-                                        
+                                        <div class="col-sm-12 text-right">
+                                            <form class="d-inline float-right mb-3" action="<%= place._id %>/?_method=DELETE" method="POST">
+                                                <button class="btn btn-link btn-sm" style="color: red;"><i class="align-middle material-icons" style="font-size: 18px;">delete</i></button>
+                                            </form>
+                                            <a href="<%= place._id %>/edit" style="text-decoration: none" class="float-right">
+                                                <button class="btn btn-link btn-sm"><i class="align-middle material-icons" style="font-size: 18px;">edit</i></button>
+                                            </a>
+                                        </div>                                                                         
                                     <% } %>
 
                                 </div>
@@ -46,15 +44,16 @@
 
                             </div>
                             
-                            <div id="commentsPlaceholder">
-                                
-                            </div>
                             <div class="input-group mb-3">
                                 <input type="text" class="form-control" id="newComment" name="comment[text]" placeholder="New comment">
                                 <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" id="addCommentButton">Add</button> 
+                                    <button class="btn btn-primary" type="button" id="addCommentButton"><i class="align-middle material-icons">add</i></button> 
                                 </div>
-                            </div>                   
+                            </div>   
+                            
+                            <div id="commentsPlaceholder">
+                                
+                            </div>                
 
                         </div>
                     </div>
@@ -65,6 +64,31 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
+
+        function editComment(commentID) {
+            $("#commentText" + commentID).hide();
+            $("#commentEdit" + commentID).show();
+        }
+
+        function discardEdit(commentID) {
+            document.getElementById("editCommentInput" + commentID).value = $("#commentText" + commentID).text()
+            $("#commentText" + commentID).show();
+            $("#commentEdit" + commentID).hide();
+        }
+
+        function approveEdit(commentID) {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/comments/' + commentID + '/?_method=PUT',
+                type: 'POST',
+                data: {'comment[text]' : document.getElementById('editCommentInput' + commentID).value, 'comment[edited]' : 'true'},
+                success: () => {
+                    document.getElementById("commentText" + commentID).innerHTML = document.getElementById('editCommentInput' + commentID).value;
+                    document.getElementById("EditedTag" + commentID).innerHTML = ", Edited";
+                    $("#commentText" + commentID).show();
+                    $("#commentEdit" + commentID).hide();
+                }
+            });
+        }
 
         function loadComments() {
             $.ajax({

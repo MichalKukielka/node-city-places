@@ -11,46 +11,42 @@
 
     <div class="row justify-content-center">
         <div class="col-md-5">
-            <form action="/<%= city %>/places" method="GET">
 
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="More interesting places"  aria-describedby="basic-addon2" name="search">
+                    <input type="text" class="form-control" placeholder="More interesting places" id="searchExp" aria-describedby="basic-addon2" name="search" oninput="loadPlaces()">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-success" type="submit">
+                        <button class="btn btn-outline-success" onclick="loadPlaces()">
                             <i class="align-middle material-icons">search</i>
                         </button>
                     </div>
                 </div>
 
-            </form>
         </div>
 
     </div>
 
-    <% if(places && places.length > 0) { %>
-        <div class="col-lg-12 text-center">
-        <h3>Most popular places in <%= cityCap %></h3>
-        </div>
+    <div id="PlacesList">
 
-        <div class="row text-center">
+    </div>
 
-            <% places.forEach(function(place){ %>
-                <div class="col-md-4 col-sm-6">
-                        <div class="card">
-                            <img class="card-img-top" src="<%= place.image %>" >  
-                            <div class="card-body">
-                                <h5 class="card-title"><%= place.name %></h5>
-                            </div>
-                            <p><a href="places/<%= place._id %>" class="btn btn-primary">More info</a></p> 
-                        </div>
-                </div>
-            <% }); %>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
 
-        </div>
+        $(document).ready(() => {
+            loadPlaces();
+        });
 
-    <% } %>
-
-
-
+        function loadPlaces() {
+            $.ajax({
+                url: "/<%= city %>/places/getPlaces",
+                type: 'GET',
+                dataType: 'html',
+                data: {'search' : $('#searchExp').val()},
+                success: (data) => {
+                    document.getElementById("PlacesList").innerHTML = data;
+                }
+            });
+        }
+    </script>
 
 <% include ../partials/footer %>

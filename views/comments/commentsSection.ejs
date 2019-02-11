@@ -1,4 +1,4 @@
-<% place.comments.forEach(function(comment){ %>
+<% for(var i=place.comments.length - 1; i >= 0; i--) { var comment = place.comments[i] %>
 <div class="card border-light mb-3">
     <div class="card-body text-dark">
 
@@ -7,11 +7,7 @@
                 <h4 class="card-title d-inline float-left">
                     <%= comment.author.username %>
                 </h4>
-                <p class="card-text d-inline float-left align-middle pl-3 pt-1"><small class="text-muted">Added
-                        <%= moment(comment.createdAt).fromNow() %>, </small>
-                    <% if( comment.edited == true) { %>
-                    <small class="text-muted">Edited</small>
-                    <% } %>
+                <p class="card-text d-inline float-left align-middle pl-3 pt-1"><small class="text-muted">Added <%= moment(comment.createdAt).fromNow() %></small><small id="EditedTag<%= comment._id %>" class="text-muted"><% if( comment.edited == true) { %>, Edited<% } %></small>
                 </p>
             </div>
             <div class="col-6">
@@ -19,19 +15,26 @@
 
                 <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
                 
-                <button type="submit" id="commentDeleteButton" class=" btn text-danger pr-0 ml-2 mr-0 btn-sm" onclick="deleteComment('<%= comment._id %>')">Delete</button>
-                <a class="" href="<%= place._id %>/comments/<%= comment._id %>/edit" style="text-decoration: none">
-                    <button href="<%= place._id %>/edit" class=" btn text-warning float-right btn-sm">Edit</button>
-                </a>
+                <div class="col-sm-12 text-right">
+                    <button class="btn btn-link btn-sm" onclick="editComment('<%= comment._id %>')"><i class="align-middle material-icons" style="font-size: 18px;">edit</i></button>
+                    <button id="commentDeleteButton" class="btn btn-link btn-sm" onclick="deleteComment('<%= comment._id %>')" style="color: red;"><i class="align-middle material-icons" style="font-size: 18px;">delete</i></button>
+                </div>
 
                 <% } %>
 
             </div>
         </div>
 
-        <p class="card-text text-justify">
-            <%= comment.text  %>
-        </p>
+        <p class="card-text text-justify" id="commentText<%= comment._id %>"><%= comment.text  %></p>
+        <div id="commentEdit<%= comment._id %>" style="display: none;">
+            <div class="input-group mb-3">
+                <input class="form-control" type="text" name="comment[text]" value='<%= comment.text %>' id="editCommentInput<%= comment._id %>">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="approveEdit('<%= comment._id %>')"><i class="align-middle material-icons">done</i></button> 
+                    <button class="btn btn-danger" type="button" onclick="discardEdit('<%= comment._id %>')"><i class="align-middle material-icons">close</i></button> 
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<% }) %>
+<% } %>
