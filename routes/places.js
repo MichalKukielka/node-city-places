@@ -126,7 +126,8 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
 router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city);
-    
+    req.session.recentURL = req.url;
+    res.send();
     req.flash("error", "You need to be logged in to do that.")
     res.render("places/new", {city:city, cityCap: cityCap});
 
@@ -139,38 +140,11 @@ router.get("/:city/places/:id", function(req, res){
             console.log(err);
         }
         else{
-            res.render("places/show", {place: place,});
+            res.render("places/show", {place: place});
         }
     });
 });
 
-router.post("/:city/places/:id/newComment", function(req, res){
-    var city = req.params.city;
-    Place.findById(req.params.id, function (err, place) {
-        if (err) {
-            console.log(err);
-            req.flash("error", "Something went wrong.");
-            res.redirect("/:city/places");
-        }
-        else {
-            Comment.create(req.body.comment, function (err, comment) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log("ASS");
-                    comment.author.id = req.user._id;
-                    comment.author.username = req.user.username;
-                    comment.save();
-                    place.comments.push(comment);
-                    place.save();
-                    req.flash("success", "Successfully added comment.");
-                    res.sendStatus(200);
-                }
-            });
-        }
-    });
-});
 
 // EDIT PLACE ROUTE
 router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, function(req, res){
