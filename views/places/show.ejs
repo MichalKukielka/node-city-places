@@ -125,8 +125,6 @@
             });
         }
 
-        
-
         $(document).ready(() => {
 
             loadComments();
@@ -146,7 +144,7 @@
                         url: '/<%= place.city %>/places/<%= place._id %>/setRating',
                         type: 'POST',
                         data: {'rating' : currentRating},
-                        success: (data) => {
+                        success: () => {
                             //document.getElementById("commentsPlaceholder").innerHTML = data;
                         }
                     }).done(function(response) {
