@@ -56,7 +56,7 @@ app.use(indexRoutes);
 app.use(placeRoutes);
 app.use(commentRoutes);
 
-app.listen(3000, 'localhost', function(){
+app.listen(3001, 'localhost', function(){
     console.log('Course project app has started!');
 });
 

@@ -152,6 +152,7 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
     var name = req.body.name;
     var image = req.body.image;
     var description = req.body.description;
+    var category = req.body.category;
     var author = {
         id: req.user._id,
         username: req.user.username
@@ -177,7 +178,8 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
             author: author,
             lat: lat,
             lng: lng,
-            location: location
+            location: location,
+            category: category
         };
         
         Place.create(newPlace, function(err, place){
@@ -196,8 +198,7 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
 router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city);
-    
-    req.flash("error", "You need to be logged in to do that.")
+
     res.render("places/new", {city:city, cityCap: cityCap});
 
 });
@@ -214,33 +215,6 @@ router.get("/:city/places/:id", function(req, res){
     });
 });
 
-router.post("/:city/places/:id/newComment", function(req, res){
-    var city = req.params.city;
-    Place.findById(req.params.id, function (err, place) {
-        if (err) {
-            console.log(err);
-            req.flash("error", "Something went wrong.");
-            res.redirect("/:city/places");
-        }
-        else {
-            Comment.create(req.body.comment, function (err, comment) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log("ASS");
-                    comment.author.id = req.user._id;
-                    comment.author.username = req.user.username;
-                    comment.save();
-                    place.comments.push(comment);
-                    place.save();
-                    req.flash("success", "Successfully added comment.");
-                    res.sendStatus(200);
-                }
-            });
-        }
-    });
-});
 
 // EDIT PLACE ROUTE
 router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, function(req, res){
@@ -310,36 +284,6 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, re
         });
     });
 });
-
-
-
-
-//     geocoder.geocode(req.body.location, function(err, data){
-
-//         if(err || !data.length) {
-//             console.log(err)
-//             req.flash("error", "Invalid adress.");
-//             return res.redirect("back");
-//         }   
-
-//         req.body.place.lat = data[0].latitude;
-//         req.body.place.lng = data[0].longitude;
-//         req.body.place.location = data[0].formattedAddress;
-
-        
-//         Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
-//             if(err){
-//                 req.flash("error", err.message + ".");
-//                 res.redirect("/" + updatedPlace.city + "/places");
-//             } else {
-//                 req.flash("success", "Successfully Updated!");
-//                 res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
-//             }
-//         });
-
-//     });
-
-// });
 
 // DESTROY PLACE ROUTE
 router.delete("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){

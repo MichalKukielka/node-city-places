@@ -34,6 +34,7 @@
                             
                 
                             <p class="card-text text-justify"><%= place.description %></p>
+                            <p class="card-text text-justify"><%= place.category %></p>
                         </div>
                     </div>
 
@@ -62,7 +63,9 @@
             </div> 
         </div> 
 
+        
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
     <script>
 
         function editComment(commentID) {
@@ -74,7 +77,7 @@
             document.getElementById("editCommentInput" + commentID).value = $("#commentText" + commentID).text()
             $("#commentText" + commentID).show();
             $("#commentEdit" + commentID).hide();
-        }
+        };
 
         function approveEdit(commentID) {
             $.ajax({
@@ -88,7 +91,7 @@
                     $("#commentEdit" + commentID).hide();
                 }
             });
-        }
+        } 
 
         function loadComments() {
             $.ajax({
@@ -158,6 +161,6 @@
                         });
                     }
                 </script>
-                <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
+
 
 <% include ../partials/footer %>

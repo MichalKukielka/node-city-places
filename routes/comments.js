@@ -17,7 +17,7 @@ router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (re
     });
 });
 
-router.get("/:city/places/:id/comments", middleware.isLoggedIn, function (req, res) {
+router.get("/:city/places/:id/comments", function (req, res) {
 
 
     Place.findById(req.params.id).populate("comments").exec(function(err, place){
@@ -99,5 +99,32 @@ router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentO
 });
 
 
+router.post("/:city/places/:id/newComment", middleware.isLoggedIn, function(req, res){
+    var city = req.params.city;
+    Place.findById(req.params.id, function (err, place) {
+        if (err) {
+            console.log(err);
+            req.flash("error", "Something went wrong.");
+            res.redirect("/:city/places");
+        }
+        else {
+            Comment.create(req.body.comment, function (err, comment) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    console.log("ASS");
+                    comment.author.id = req.user._id;
+                    comment.author.username = req.user.username;
+                    comment.save();
+                    place.comments.push(comment);
+                    place.save();
+                    req.flash("success", "Successfully added comment.");
+                    res.sendStatus(200);
+                }
+            });
+        }
+    });
+});
 
 module.exports = router
