@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "package_file",
   "version": "1.0.0",
   "description": "Contains list of packages used in project.",
@@ -24,7 +24,10 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^5.0.1",
-    "request-promise": "^4.2.2"
+    "rater-js": "^0.5.8",
+    "rateyo": "^2.3.5",
+    "request-promise": "^4.2.2",
+    "star-rating-svg": "^3.5.0"
   },
   "devDependencies": {},
   "scripts": {

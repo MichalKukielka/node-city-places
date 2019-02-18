@@ -3,6 +3,7 @@ var express    = require("express"),
     middleware = require('../middleware/index'),
     Place      = require("../models/place"),
     Comment    = require("../models/comment");
+    Rating    = require("../models/rating");
 
 
 router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (req, res) {
@@ -30,6 +31,60 @@ router.get("/:city/places/:id/comments", function (req, res) {
     });
 
 
+});
+
+router.post("/:city/places/:id/setRating", function(req, res){
+    console.log(req.query);
+    var city = req.params.city;
+    Place.findById(req.params.id).populate("ratings").exec(function(err, place) {
+        if(err) {
+            console.log(err);
+            req.flash("error", "Something went wrong.");
+            res.redirect("/:city/places");
+        }
+        Rating.create(req.query.rating, function(err, rating) {
+            if(err) {
+                console.log(err);
+                req.flash("error", "Something went wrong.");
+                res.redirect("/:city/places");
+            }
+            rating.author.id = req.user._id;
+            rating.author.username = req.user.username;
+            rating.place = place;
+            rating.save();
+            place.ratings.push(rating);
+            place.save();
+            req.flash("success", "Successfully added rating.");
+            res.sendStatus(200);
+        })
+    })
+});
+
+router.post("/:city/places/:id/newComment", function(req, res){
+    var city = req.params.city;
+    Place.findById(req.params.id, function (err, place) {
+        if (err) {
+            console.log(err);
+            req.flash("error", "Something went wrong.");
+            res.redirect("/:city/places");
+        }
+        else {
+            Comment.create(req.body.comment, function (err, comment) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    comment.author.id = req.user._id;
+                    comment.author.username = req.user.username;
+                    comment.save();
+                    place.comments.push(comment);
+                    place.save();
+                    req.flash("success", "Successfully added comment.");
+                    res.sendStatus(200);
+                }
+            });
+        }
+    });
 });
 
 router.post("/:city/places/:id/comments", middleware.isLoggedIn, function (req, res) {

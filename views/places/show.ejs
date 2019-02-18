@@ -1,16 +1,14 @@
 <% include ../partials/header %>
-
         <div class="row">
             <div class="col-md-3">
                 <div id="map"></div>
             </div> 
             <div class="col-md-9">
-
                     <div class="card border-light mb-3">
                         <img class="card-img-top" src="<%= place.image %>">
                         <div class="card-body">
-                            <h2 class="card-title text-primary"><%= place.name %></h2>
-
+                            <h2 class="card-title text-primary"><%= place.name %></h2> 
+                            <div class="my-rating"></div>
                             <div class="row">
                                 <div class="col-6">
                                     <h6 class="card-text float-left d-inline">Submitted by <a href="/users/<%= place.author.id %>"><%= place.author.username %></a>, <%= moment(place.createdAt).fromNow() %></h6>
@@ -44,14 +42,17 @@
                                 <h4 class="d-inline">Comments</h4>
 
                             </div>
-                            
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" id="newComment" name="comment[text]" placeholder="New comment">
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button" id="addCommentButton"><i class="align-middle material-icons">add</i></button> 
-                                </div>
-                            </div>   
-                            
+
+                            <% if(currentUser) { %>
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" id="newComment" name="comment[text]" placeholder="New comment">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" id="addCommentButton"><i class="align-middle material-icons">add</i></button> 
+                                    </div>
+                                </div>   
+                            <% } %>
+
+                                
                             <div id="commentsPlaceholder">
                                 
                             </div>                
@@ -62,6 +63,9 @@
 
             </div> 
         </div> 
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="/star-svg/src/jquery.star-rating-svg.js"></script>
+        <link rel="stylesheet" type="text/css" href="/star-svg/src/css/star-rating-svg.css">
 
         
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -125,6 +129,8 @@
             });
         }
 
+        
+
         $(document).ready(() => {
 
             loadComments();
@@ -132,8 +138,27 @@
             $('#addCommentButton').click(() => {
                 addCommentToDB();
             });
-
         });
+
+        function webpageReady() {
+            $(".my-rating").starRating({
+                starSize: 25,
+                disableAfterRate: false,
+                callback: function(currentRating, $el){
+                    console.log({'rating' : currentRating});
+                    $.ajax({
+                        url: '/<%= place.city %>/places/<%= place._id %>/setRating',
+                        type: 'POST',
+                        data: {'rating' : currentRating},
+                        success: (data) => {
+                            //document.getElementById("commentsPlaceholder").innerHTML = data;
+                        }
+                    }).done(function(response) {
+                            console.log(response);
+                    });
+                }
+            });
+        }
 
                     function initMap() {
                         var lat = <%= place.lat %>;

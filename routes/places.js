@@ -198,7 +198,6 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
 router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city);
-
     res.render("places/new", {city:city, cityCap: cityCap});
 
 });
@@ -210,7 +209,7 @@ router.get("/:city/places/:id", function(req, res){
             console.log(err);
         }
         else{
-            res.render("places/show", {place: place,});
+            res.render("places/show", {place: place});
         }
     });
 });

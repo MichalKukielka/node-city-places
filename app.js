@@ -24,7 +24,6 @@ var placeRoutes    = require("./routes/places"),
 // seedDB();
 mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: true });
 
-
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
