@@ -14,12 +14,53 @@ var options = {
 
 var geocoder = NodeGeocoder(options)
 
+
 router.get("/:city/places/getPlaces", function(req, res){
 
     var city = req.params.city;
     var cityCap = toTitleCase(city);
 
-    if(req.query.search){
+    if(req.query.category && req.query.search)  {
+
+        if(req.query.category === 'All'){
+            const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+
+            Place.find({"city": city, "name": regex}, function(err, places){
+                if(err){
+                    console.log(err);
+                }
+                else {
+                    
+                    if(places.length<=0){
+                        req.flash("warning", "No places matched");
+                        res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    }
+                    else {
+                        res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    }
+    
+                }
+            });
+        } else {
+
+            const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+            Place.find({"city": city, 'category': req.query.category, 'name': regex}, function(err, places){
+                if(err){
+                    console.log(err);
+                }
+                else {
+    
+                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+    
+                }
+            });
+    
+
+        }
+
+
+
+    } else if(req.query.search){
     
         const regex = new RegExp(escapeRegex(req.query.search), 'gi');
 
@@ -39,8 +80,37 @@ router.get("/:city/places/getPlaces", function(req, res){
 
             }
         });
+    } else if(req.query.category)  {
 
-    } else {
+        if(req.query.category === 'All'){
+            Place.find({"city": city}, function(err, places){
+                if(err){
+                    console.log(err);
+                }
+                else {
+    
+                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+    
+                }
+            });
+
+        } else {
+
+
+        Place.find({"city": city, 'category': req.query.category}, function(err, places){
+            if(err){
+                console.log(err);
+            }
+            else {
+
+                res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+
+            }
+        });
+        }
+
+
+    } else  {
         
         Place.find({"city": city}, function(err, places){
             if(err){
