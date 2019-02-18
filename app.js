@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-var express        = require("express"),
+const express        = require("express"),
     app            = express(),
     bodyParser     = require("body-parser"),
     mongoose       = require("mongoose"),
@@ -16,13 +16,16 @@ var express        = require("express"),
     seedDB         = require("./seeds");
 
 
-var placeRoutes    = require("./routes/places"),
+const placeRoutes    = require("./routes/places"),
     commentRoutes  = require("./routes/comments"),
     indexRoutes    = require("./routes/index");
     
 
 // seedDB();
-mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: true });
+const db = require('./key').MongoURI;
+mongoose.connect( db, { useNewUrlParser: true })
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.log(err));
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
