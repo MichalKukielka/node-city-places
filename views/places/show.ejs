@@ -18,10 +18,10 @@
                                         
                                         <div class="col-sm-12 text-right">
                                             <form class="d-inline float-right mb-3" action="<%= place._id %>/?_method=DELETE" method="POST">
-                                                <button class="btn btn-link btn-sm" style="color: red;"><i class="align-middle material-icons" style="font-size: 18px;">delete</i></button>
+                                                <button class="btn btn-link btn-sm text-danger"><i class="align-middle material-icons">delete</i></button>
                                             </form>
-                                            <a href="<%= place._id %>/edit" style="text-decoration: none" class="float-right">
-                                                <button class="btn btn-link btn-sm"><i class="align-middle material-icons" style="font-size: 18px;">edit</i></button>
+                                            <a href="<%= place._id %>/edit" class="float-right">
+                                                <button class="btn btn-link btn-sm text-warning"><i class="align-middle material-icons">edit</i></button>
                                             </a>
                                         </div>                                                                         
                                     <% } %>

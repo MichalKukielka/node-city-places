@@ -203,13 +203,13 @@ router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
 });
 
 router.get("/:city/places/:id", function(req, res){
-    var city = req.params.city;
+    var city = toTitleCase(req.params.city);
     Place.findById(req.params.id).populate("comments").exec(function(err, place){
         if(err){
             console.log(err);
         }
         else{
-            res.render("places/show", {place: place});
+            res.render("places/show", {place: place, cityTitle: city});
         }
     });
 });
@@ -306,6 +306,7 @@ function toTitleCase(string){
         return match.toLowerCase();
     });
 }
+
 function escapeRegex(text){
     return text.replace(/[-[\]{}()*+?.,\\^$!#\s]/g, "\\$&")
 };

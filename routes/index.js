@@ -9,23 +9,23 @@ var express    = require("express"),
     Place      = require("../models/place");
 
     
-router.get("/", function(req, res){
+router.get("/", (req, res) => {
     
     res.render("landing");
 });
 
-router.post("/", function(req, res){
+router.post("/", (req, res) => {
     res.redirect("/" + req.body.search.toLowerCase() + "/places")
 
 });
 
 //REGISTER FORM
 
-router.get("/register", function(req, res){
+router.get("/register", (req, res) => {
     res.render("register");
 });
 
-router.post("/register", function(req, res){
+router.post("/register", (req, res) => {
     var newUser = new User({
         username: req.body.username,
         first_name: req.body.firstName,
@@ -46,7 +46,7 @@ router.post("/register", function(req, res){
 
 // LOGIN FORM
 
-router.get("/login", function(req, res){
+router.get("/login", (req, res) => {
 
     res.render("login");
 });
@@ -59,7 +59,7 @@ router.post("/login", passport.authenticate("local",
 
 // LOGOUT LOGIC ROUTE
 
-router.get("/logout", function(req, res){
+router.get("/logout", (req, res) => {
     req.logout();
     req.flash("success", "Logged You Out!")
     res.redirect("/");
@@ -67,7 +67,7 @@ router.get("/logout", function(req, res){
 
 // USER PROFILE
 
-router.get("/users/:id", middleware.isLoggedIn, function(req, res){
+router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
     
     User.findById(req.params.id, function (err, user){
         
@@ -86,7 +86,7 @@ router.get("/users/:id", middleware.isLoggedIn, function(req, res){
 
 });
 
-router.get("/password/reset", function(req, res){
+router.get("/password/reset",  (req, res) => {
     res.render('forgot');
 });
 

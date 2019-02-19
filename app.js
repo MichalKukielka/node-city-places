@@ -45,23 +45,29 @@ passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use(function(req, res, next){
+
+
+app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.cityTitle = req.city;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     res.locals.warning = req.flash("warning");
     next();
 });
 
+
 app.use(indexRoutes);
 app.use(placeRoutes);
 app.use(commentRoutes);
+
+
 
 app.use((req, res, next) => {
     res.status(404).render('errors/404');
 });
 
-app.listen(3001, 'localhost', function(){
+app.listen(3001, 'localhost', () => {
     console.log('Course project app has started!');
 });
 

@@ -11,6 +11,7 @@
             <div class="card-body">
                 <h4 class="card-title"><%= user.username %></h4>
 
+
                 <ul class="list-group list-group-flush w-75">
                     <li class="list-group-item pl-0 pb-0 text-muted"><small><%= user.first_name %> <%= user.last_name %></small></li>
                     <li class="list-group-item pl-0 pb-0 text-muted"><small><%= user.email %></small></li>
@@ -26,7 +27,15 @@
 
                 </ul>
 
+
             </div>
+            
+            <% if(user._id.equals(currentUser._id)) { %>
+
+                <a href="/password/reset" style="text-decoration: none" class="float-right">
+                    <button class="btn btn-link btn-sm">Reset Password</button>
+                </a>                                                                     
+            <% } %>
         </div>
     </div>
 
