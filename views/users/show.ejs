@@ -20,7 +20,7 @@
 
                     <% places.forEach(function(place){ %>
                         <li class="list-group-item pl-0 pb-0 text-muted">
-                        <small><a href="/<%= place.city %>/places/<%= place.id %>"><%= place.name %></a></small>
+                        <small><a href="/<%= place.city %>/places/<%= place.id %>"><%= place.city %>: <%= place.name %></a></small>
                         </li>
                     <% }) %>                     
 
