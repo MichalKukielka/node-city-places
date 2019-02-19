@@ -6,7 +6,7 @@ var express    = require("express"),
     Rating    = require("../models/rating");
 
 
-router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (req, res) {
+router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, (req, res) => {
 
     Place.findById(req.params.id, function (err, place) {
         if (err) {
@@ -18,7 +18,7 @@ router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (re
     });
 });
 
-router.get("/:city/places/:id/comments", function (req, res) {
+router.get("/:city/places/:id/comments",  (req, res) => {
 
 
     Place.findById(req.params.id).populate("comments").exec(function(err, place){
@@ -33,7 +33,7 @@ router.get("/:city/places/:id/comments", function (req, res) {
 
 });
 
-router.post("/:city/places/:id/setRating", function(req, res){
+router.post("/:city/places/:id/setRating", (req, res) => {
     console.log(req.query);
     var city = req.params.city;
     Place.findById(req.params.id).populate("ratings").exec(function(err, place) {
@@ -60,7 +60,7 @@ router.post("/:city/places/:id/setRating", function(req, res){
     })
 });
 
-router.post("/:city/places/:id/newComment", function(req, res){
+router.post("/:city/places/:id/newComment", (req, res) => {
     var city = req.params.city;
     Place.findById(req.params.id, function (err, place) {
         if (err) {
@@ -87,7 +87,7 @@ router.post("/:city/places/:id/newComment", function(req, res){
     });
 });
 
-router.post("/:city/places/:id/comments", middleware.isLoggedIn, function (req, res) {
+router.post("/:city/places/:id/comments", middleware.isLoggedIn, (req, res) => {
     Place.findById(req.params.id, function (err, place) {
         if (err) {
             console.log(err);
@@ -113,7 +113,7 @@ router.post("/:city/places/:id/comments", middleware.isLoggedIn, function (req, 
     });
 });
 
-router.get("/:city/places/:id/comments/:comment_id/edit", middleware.checkCommentOwnership, function(req, res){
+router.get("/:city/places/:id/comments/:comment_id/edit", middleware.checkCommentOwnership,  (req, res) => {
             
     Comment.findById(req.params.comment_id, function(err, comment){
         if (err) {
@@ -126,7 +126,7 @@ router.get("/:city/places/:id/comments/:comment_id/edit", middleware.checkCommen
 
 });
 
-router.put("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership, function(req, res){
+router.put("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership,  (req, res) => {
 
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updatedComment){
         if (err) {
@@ -139,7 +139,7 @@ router.put("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwne
 
 });
 
-router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership, function(req, res){
+router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership, (req, res) => {
 
     Comment.findByIdAndRemove(req.params.comment_id, function(err){
         if (err) {
@@ -154,7 +154,7 @@ router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentO
 });
 
 
-router.post("/:city/places/:id/newComment", middleware.isLoggedIn, function(req, res){
+router.post("/:city/places/:id/newComment", middleware.isLoggedIn, (req, res) => {
     var city = req.params.city;
     Place.findById(req.params.id, function (err, place) {
         if (err) {

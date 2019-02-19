@@ -15,7 +15,7 @@ var options = {
 var geocoder = NodeGeocoder(options)
 
 
-router.get("/:city/places/getPlaces", function(req, res){
+router.get("/:city/places/getPlaces", (req, res) => {
 
     var city = req.params.city;
     var cityCap = toTitleCase(city);
@@ -129,7 +129,7 @@ router.get("/:city/places/getPlaces", function(req, res){
 
 });
 
-router.get("/:city/places", function(req, res){
+router.get("/:city/places",  (req, res) => {
 
     var city = req.params.city;
     var cityCap = toTitleCase(city);
@@ -146,7 +146,7 @@ router.get("/:city/places", function(req, res){
     })
 });
 
-router.post("/:city/places", middleware.isLoggedIn, function(req, res){
+router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
 
     var city = req.params.city;
     var name = req.body.name;
@@ -158,7 +158,7 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
         username: req.user.username
     };
 
-    geocoder.geocode(req.body.location, function(err, data){
+    geocoder.geocode(req.body.location, (req, res) => {
 
         if(err || !data.length) {
             req.flash("error", "Invalid adress");
@@ -195,7 +195,7 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
 
 });
 
-router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
+router.get("/:city/places/new", middleware.isLoggedIn, (req, res) => {
     var city = req.params.city;
     var cityCap = toTitleCase(city);
     res.render("places/new", {city:city, cityCap: cityCap});
@@ -216,7 +216,7 @@ router.get("/:city/places/:id", function(req, res){
 
 
 // EDIT PLACE ROUTE
-router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, function(req, res){
+router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, (req, res) => {
 
     Place.findById(req.params.id, function(err, place){
         
@@ -231,7 +231,7 @@ router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, function(re
 });
 
 // UPDATE PLACE ROUTE
-router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
+router.put("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
 
 
     geocoder.geocode(req.body.location, function(err, data){
@@ -261,7 +261,7 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, re
 
 });
 
-router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
+router.put("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
 
     geocoder.geocode(req.body.location, function (err, data) {
         if (err || !data.length) {
@@ -285,7 +285,7 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, function(req, re
 });
 
 // DESTROY PLACE ROUTE
-router.delete("/:city/places/:id", middleware.checkPlaceOwnership, function(req, res){
+router.delete("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
     city = req.params.city
     Place.findByIdAndRemove(req.params.id, function(err, place){
         if (err) {

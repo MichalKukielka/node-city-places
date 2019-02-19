@@ -90,7 +90,7 @@ router.get("/password/reset",  (req, res) => {
     res.render('forgot');
 });
 
-router.post("/password/reset", function(req, res, next){
+router.post("/password/reset", (req, res, next) => {
 
     async.waterfall([
         function(done){
@@ -145,7 +145,7 @@ router.post("/password/reset", function(req, res, next){
 
 });
 
-router.get("/password/reset/:token", function(req, res){
+router.get("/password/reset/:token", (req, res) => {
 
     User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
         if(!user){
@@ -157,7 +157,7 @@ router.get("/password/reset/:token", function(req, res){
         res.render('reset', {token: req.params.token});
 });
 
-router.post("/password/reset/:token", function(req, res){
+router.post("/password/reset/:token", (req, res) => {
     async.waterfall([
         function(done){
             User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
