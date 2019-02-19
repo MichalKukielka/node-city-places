@@ -21,7 +21,6 @@ const placeRoutes    = require("./routes/places"),
     indexRoutes    = require("./routes/index");
     
 
-// seedDB();
 const db = require('./key').MongoURI;
 mongoose.connect( db, { useNewUrlParser: true })
     .then(() => console.log('MongoDB Connected'))
