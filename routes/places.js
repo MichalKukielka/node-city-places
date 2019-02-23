@@ -158,7 +158,7 @@ router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
         username: req.user.username
     };
 
-    geocoder.geocode(req.body.location, (req, res) => {
+    geocoder.geocode(req.body.location, (err, data) => {
 
         if(err || !data.length) {
             req.flash("error", "Invalid adress");
