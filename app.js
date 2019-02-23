@@ -22,7 +22,7 @@ var placeRoutes    = require("./routes/places"),
     
 
 // seedDB();
-mongoose.connect("mongodb://localhost:27017/city_places", { useNewUrlParser: true });
+mongoose.connect("mongodb://localhost:27017/city_places_2", { useNewUrlParser: true });
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));

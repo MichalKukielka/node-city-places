@@ -126,11 +126,7 @@ router.post("/:city/places", middleware.isLoggedIn, function(req, res){
 router.get("/:city/places/new", middleware.isLoggedIn, function(req, res){
     var city = req.params.city;
     var cityCap = toTitleCase(city);
-    req.session.recentURL = req.url;
-    res.send();
-    req.flash("error", "You need to be logged in to do that.")
     res.render("places/new", {city:city, cityCap: cityCap});
-
 });
 
 router.get("/:city/places/:id", function(req, res){

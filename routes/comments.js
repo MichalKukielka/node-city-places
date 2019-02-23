@@ -4,6 +4,7 @@ var express    = require("express"),
     Place      = require("../models/place"),
     Comment    = require("../models/comment");
     Rating    = require("../models/rating");
+    ObjectId = require('mongodb').ObjectID;
 
 
 router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (req, res) {
@@ -16,6 +17,27 @@ router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, function (re
             res.render("comments/new", { place: place, currentUser: req.user });
         }
     });
+});
+
+router.get("/:city/places/:id/rating", function (req, res) {
+    Rating.findOne({'author.id': req.user._id, 'place': ObjectId(req.params.id)}).populate("ratings").exec(function(err, rating){
+        if(err){
+            console.log(err);
+        }
+        else{
+            if(rating == null) res.send({userRating : 0});
+            else res.send({userRating : rating});
+        }
+    });
+});
+
+router.get("/:city/places/:id/avgRating", function (req, res) {
+    Rating.aggregate([
+        {"$match": { "place": ObjectId(req.params.id)}},
+        {$group: {_id: "$place", avg: {$avg: "$rating"}, count: {$sum: 1}}}
+    ]).then(function(result) {
+        res.send(result);
+    })
 });
 
 router.get("/:city/places/:id/comments", function (req, res) {
@@ -42,26 +64,42 @@ router.post("/:city/places/:id/setRating", function(req, res){
             res.redirect("/:city/places");
         }
         else {
-            Rating.create({rating: req.body.rating}, function (err, rating) {
-                if (err) {
-                    console.log(err);
-                    req.flash("error", "Something went wrong.");
-                    res.redirect("/:city/places");
+            Rating.count({'author.id': req.user._id, 'place': ObjectId(req.params.id)}, function(err, count){
+                if(count == 0) {
+                    Rating.create({rating: req.body.rating}, function (err, rating) {
+                        if (err) {
+                            console.log(err);
+                            req.flash("error", "Something went wrong.");
+                            res.redirect("/:city/places");
+                        }
+                        else {
+                            rating.author.id = req.user._id;
+                            rating.author.username = req.user.username;
+                            rating.place = place;
+                            rating.save();
+                            place.ratings.push(rating);
+                            place.save();
+                            req.flash("success", "Successfully added rating.");
+                            res.sendStatus(200);
+                        }
+                    });
+                } else {
+                    Rating.findOneAndUpdate({'author.id': req.user._id, 'place': ObjectId(req.params.id)}, {rating: req.body.rating}, function(err, rating){
+                        if(err) {
+                            console.log(err);
+                            req.flash("error", "Something went wrong.");
+                            res.redirect("/:city/places");
+                        } else {
+                            req.flash("success", "Rating updated.");
+                            res.sendStatus(200);
+                        }
+                    });
                 }
-                else {
-                    rating.author.id = req.user._id;
-                    rating.author.username = req.user.username;
-                    rating.place = place;
-                    rating.save();
-                    place.ratings.push(rating);
-                    place.save();
-                    req.flash("success", "Successfully added rating.");
-                    res.sendStatus(200);
-                }
-            });
+            })
         }
     });
 });
+
 
 router.post("/:city/places/:id/newComment", function(req, res){
     var city = req.params.city;
