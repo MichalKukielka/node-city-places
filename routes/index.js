@@ -7,7 +7,16 @@ var express    = require("express"),
     crypto     = require('crypto')
     User       = require("../models/user"),
     Place      = require("../models/place");
+    NodeGeocoder = require('node-geocoder');
 
+var options = {
+    provider: "google",
+    httpAdapter: 'https',
+    apiKey: process.env.GEOCODER_API_KEY,
+    formatter: null
+}
+
+var geocoder = NodeGeocoder(options)
     
 router.get("/", function(req, res){
     
@@ -15,6 +24,12 @@ router.get("/", function(req, res){
 });
 
 router.post("/", function(req, res){
+    
+    geocoder
+    geocoder.geocode(req.body.search.toLowerCase(), function(err, res) {
+        console.log(res);
+      });
+    //res.redirect("/");
     res.redirect("/" + req.body.search.toLowerCase() + "/places")
 
 });

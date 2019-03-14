@@ -94,6 +94,14 @@
             $("#commentEdit" + commentID).hide();
         }
 
+        function commentEditKeyUp(event, commentID) {
+            if (event.keyCode === 13) { //13 is Enter
+                approveEdit(commentID);
+            }else if(event.keyCode === 27) { //27 is Escape
+                discardEdit(commentID);
+            }
+        }
+
         function approveEdit(commentID) {
             $.ajax({
                 url: '/<%= place.city %>/places/<%= place.id %>/comments/' + commentID + '/?_method=PUT',
@@ -104,6 +112,16 @@
                     document.getElementById("EditedTag" + commentID).innerHTML = ", Edited";
                     $("#commentText" + commentID).show();
                     $("#commentEdit" + commentID).hide();
+                }
+            });
+        }
+
+        function deleteRaitng() {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/deleteRating',
+                type: 'DELETE',
+                success: (data) => {
+                    getAvgRating();
                 }
             });
         }
@@ -126,7 +144,6 @@
                 type: 'GET',
                 dataType: 'json',
                 success: (data) => {
-                    console.log(data);
                     if(data.length > 0) {
                         $('#rateField').show();
                         $('#noVotes').hide();
@@ -183,6 +200,13 @@
             $('#addCommentButton').click(() => {
                 addCommentToDB();
             });
+
+            document.getElementById("newComment").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) { //13 is Enter
+                    event.preventDefault();
+                    addCommentToDB();
+                }
+            });
         });
 
         function webpageReady() { 
@@ -192,14 +216,18 @@
                     starSize: 20,
                     disableAfterRate: false,
                     callback: function(currentRating, $el){
-                        $.ajax({
-                            url: '/<%= place.city %>/places/<%= place._id %>/setRating',
-                            type: 'POST',
-                            data: {'rating' : currentRating},
-                            success: () => {
-                                getAvgRating();
-                            }
-                        });
+                        if(currentRating == 0) {
+                            deleteRaitng();
+                        }else{
+                            $.ajax({
+                                url: '/<%= place.city %>/places/<%= place._id %>/setRating',
+                                type: 'POST',
+                                data: {'rating' : currentRating},
+                                success: () => {
+                                    getAvgRating();
+                                }
+                            });
+                        }
                     }
                 });
                 getUserRating();

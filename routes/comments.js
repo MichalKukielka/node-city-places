@@ -100,6 +100,28 @@ router.post("/:city/places/:id/setRating", function(req, res){
     });
 });
 
+router.delete("/:city/places/:id/deleteRating", function(req, res){
+    var city = req.params.city;
+    Place.findById(req.params.id).populate("ratings").exec(function (err, place) {
+        if (err) {
+            console.log(err);
+            req.flash("error", "Something went wrong.");
+            res.redirect("/:city/places");
+        }else{
+            Rating.deleteOne({'author.id': req.user._id, 'place': ObjectId(req.params.id)}, function(err) {
+                if (err) {
+                    console.log(err);
+                    req.flash("error", "Something went wrong.");
+                    res.sendStatus(502);
+                } else {
+                    req.flash("success", "Rating deleted.");
+                    res.sendStatus(200);
+                }
+            })
+        }
+    });
+});
+
 
 router.post("/:city/places/:id/newComment", function(req, res){
     var city = req.params.city;
