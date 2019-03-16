@@ -16,8 +16,8 @@
                 <% if(currentUser && comment.author.id.equals(currentUser._id)) { %>
                 
                 <div class="col-sm-12 text-right">
-                    <button class="btn btn-link btn-sm" onclick="editComment('<%= comment._id %>')"><i class="align-middle material-icons" style="font-size: 18px;">edit</i></button>
-                    <button id="commentDeleteButton" class="btn btn-link btn-sm" onclick="deleteComment('<%= comment._id %>')" style="color: red;"><i class="align-middle material-icons" style="font-size: 18px;">delete</i></button>
+                    <button class="btn btn-link btn-sm text-warning" onclick="editComment('<%= comment._id %>')"><i class="align-middle material-icons">edit</i></button>
+                    <button id="commentDeleteButton" class="btn btn-link btn-sm text-danger" onclick="deleteComment('<%= comment._id %>')"><i class="align-middle material-icons">delete</i></button>
                 </div>
 
                 <% } %>

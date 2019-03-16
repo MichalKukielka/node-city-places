@@ -10,21 +10,36 @@
 
 
     <div class="row justify-content-center">
-        <div class="col-md-5">
 
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="More interesting places" id="searchExp" aria-describedby="basic-addon2" name="search" oninput="loadPlaces()">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-success" onclick="loadPlaces()">
-                            <i class="align-middle material-icons">search</i>
-                        </button>
-                    </div>
+    <div class="col-md-5">
+
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="More interesting places" id="searchExp" aria-describedby="basic-addon2" name="search" oninput="loadPlaces()">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-success" onclick="loadPlaces()">
+                        <i class="align-middle material-icons">search</i>
+                    </button>
                 </div>
-
-        </div>
+            </div>
 
     </div>
 
+    <div class="col-md-2">
+            <div class="input-group mb-3">
+                    <select class="custom-select mr-sm-2" id="category" onchange="loadPlaces()">
+                            <option disabled selected value="All">Category</option>
+                            <option value="Drinks" onclick="loadPlaces()">Drinks</option>
+                            <option value="Culture" onselect="loadPlaces()">Culture</option>
+                            <option value="Sport" onselect="loadPlaces()">Sport</option>
+                            <option value="Restaurant" onselect="loadPlaces()">Restaurant</option>
+                            <option value="Other" onselect="loadPlaces()">Other</option>
+                            <option value="All" onselect="loadPlaces()">All</option>
+                    </select>
+            </div>
+
+    </div>
+
+</div>
     <div id="PlacesList">
 
     </div>
@@ -39,7 +54,11 @@
                 url: "/<%= city %>/places/getPlaces",
                 type: 'GET',
                 dataType: 'html',
-                data: {'search' : $('#searchExp').val()},
+                data: {'search' : $('#searchExp').val(),
+                        'category': $('#category').val(),
+            
+                    },
+                    
                 success: (data) => {
                     document.getElementById("PlacesList").innerHTML = data;
                 }

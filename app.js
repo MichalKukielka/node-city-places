@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-var express        = require("express"),
+const express        = require("express"),
     app            = express(),
     bodyParser     = require("body-parser"),
     mongoose       = require("mongoose"),
@@ -16,13 +16,15 @@ var express        = require("express"),
     seedDB         = require("./seeds");
 
 
-var placeRoutes    = require("./routes/places"),
+const placeRoutes    = require("./routes/places"),
     commentRoutes  = require("./routes/comments"),
     indexRoutes    = require("./routes/index");
     
 
-// seedDB();
-mongoose.connect("mongodb://localhost:27017/city_places_2", { useNewUrlParser: true });
+const db = require('./key').MongoURI;
+mongoose.connect( db, { useNewUrlParser: true })
+    .then(() => console.log('MongoDB Connected'))
+    .catch(err => console.log(err));
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -43,19 +45,29 @@ passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-app.use(function(req, res, next){
+
+
+app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.cityTitle = req.city;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     res.locals.warning = req.flash("warning");
     next();
 });
 
+
 app.use(indexRoutes);
 app.use(placeRoutes);
 app.use(commentRoutes);
 
-app.listen(3000, 'localhost', function(){
+
+
+app.use((req, res, next) => {
+    res.status(404).render('errors/404');
+});
+
+app.listen(3001, 'localhost', () => {
     console.log('Course project app has started!');
 });
 

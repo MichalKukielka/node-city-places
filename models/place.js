@@ -23,6 +23,12 @@ var placeSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    category: {
+        type: String,
+        default: "Other"
+
+    },
+
     ratings: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Rating"

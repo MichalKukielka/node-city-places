@@ -81,6 +81,8 @@
             </div> 
         </div> 
 
+        
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
     <script>
 
         function editComment(commentID) {
@@ -92,7 +94,7 @@
             document.getElementById("editCommentInput" + commentID).value = $("#commentText" + commentID).text()
             $("#commentText" + commentID).show();
             $("#commentEdit" + commentID).hide();
-        }
+        };
 
         function commentEditKeyUp(event, commentID) {
             if (event.keyCode === 13) { //13 is Enter
@@ -114,7 +116,7 @@
                     $("#commentEdit" + commentID).hide();
                 }
             });
-        }
+        } 
 
         function deleteRaitng() {
             $.ajax({
@@ -230,6 +232,7 @@
                         }
                     }
                 });
+                
                 getUserRating();
             }
             getAvgRating();
@@ -263,5 +266,5 @@
                 </script>
                 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
                 <script type="text/javascript">webpageReady();</script>
-                
+
 <% include ../partials/footer %>

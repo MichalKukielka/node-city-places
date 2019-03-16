@@ -18,29 +18,23 @@ var options = {
 
 var geocoder = NodeGeocoder(options)
     
-router.get("/", function(req, res){
+router.get("/", (req, res) => {
     
     res.render("landing");
 });
 
-router.post("/", function(req, res){
-    
-    geocoder
-    geocoder.geocode(req.body.search.toLowerCase(), function(err, res) {
-        console.log(res);
-      });
-    //res.redirect("/");
+router.post("/", (req, res) => {
     res.redirect("/" + req.body.search.toLowerCase() + "/places")
 
 });
 
 //REGISTER FORM
 
-router.get("/register", function(req, res){
+router.get("/register", (req, res) => {
     res.render("register");
 });
 
-router.post("/register", function(req, res){
+router.post("/register", (req, res) => {
     var newUser = new User({
         username: req.body.username,
         first_name: req.body.firstName,
@@ -61,7 +55,7 @@ router.post("/register", function(req, res){
 
 // LOGIN FORM
 
-router.get("/login", function(req, res){
+router.get("/login", (req, res) => {
 
     res.render("login");
 });
@@ -74,7 +68,7 @@ router.post("/login", passport.authenticate("local",
 
 // LOGOUT LOGIC ROUTE
 
-router.get("/logout", function(req, res){
+router.get("/logout", (req, res) => {
     req.logout();
     req.flash("success", "Logged You Out!")
     res.redirect("/");
@@ -82,7 +76,7 @@ router.get("/logout", function(req, res){
 
 // USER PROFILE
 
-router.get("/users/:id", middleware.isLoggedIn, function(req, res){
+router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
     
     User.findById(req.params.id, function (err, user){
         
@@ -101,11 +95,11 @@ router.get("/users/:id", middleware.isLoggedIn, function(req, res){
 
 });
 
-router.get("/password/reset", function(req, res){
+router.get("/password/reset",  (req, res) => {
     res.render('forgot');
 });
 
-router.post("/password/reset", function(req, res, next){
+router.post("/password/reset", (req, res, next) => {
 
     async.waterfall([
         function(done){
@@ -160,7 +154,7 @@ router.post("/password/reset", function(req, res, next){
 
 });
 
-router.get("/password/reset/:token", function(req, res){
+router.get("/password/reset/:token", (req, res) => {
 
     User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
         if(!user){
@@ -172,7 +166,7 @@ router.get("/password/reset/:token", function(req, res){
         res.render('reset', {token: req.params.token});
 });
 
-router.post("/password/reset/:token", function(req, res){
+router.post("/password/reset/:token", (req, res) => {
     async.waterfall([
         function(done){
             User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
