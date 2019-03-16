@@ -22,7 +22,7 @@ const placeRoutes    = require("./routes/places"),
     
 
 const db = require('./key').MongoURI;
-mongoose.connect( "mongodb://localhost:27017/city_places", { useNewUrlParser: true })
+mongoose.connect( db, { useNewUrlParser: true })
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 
@@ -67,7 +67,7 @@ app.use((req, res, next) => {
     res.status(404).render('errors/404');
 });
 
-app.listen(3001, 'localhost', () => {
+app.listen(3000, 'localhost', () => {
     console.log('Course project app has started!');
 });
 
