@@ -8,18 +8,13 @@ const express        = require("express"),
     localStrategy  = require("passport-local"),
     methodOverride = require("method-override"),
     flash          = require("connect-flash"),
-
-
-    Place          = require("./models/place"),
-    Comment        = require("./models/comment"),
-    User           = require("./models/user"),
-    seedDB         = require("./seeds");
+    User           = require("./models/user");
 
 
 const placeRoutes    = require("./routes/places"),
-    commentRoutes  = require("./routes/comments"),
-    indexRoutes    = require("./routes/index");
-    
+    commentRoutes    = require("./routes/comments"),
+    indexRoutes      = require("./routes/index");
+    ratingRoutes     = require("./routes/ratings");
 
 const db = require('./key').MongoURI;
 mongoose.connect( db, { useNewUrlParser: true })
@@ -60,7 +55,7 @@ app.use((req, res, next) => {
 app.use(indexRoutes);
 app.use(placeRoutes);
 app.use(commentRoutes);
-
+app.use(ratingRoutes);
 
 
 app.use((req, res, next) => {
