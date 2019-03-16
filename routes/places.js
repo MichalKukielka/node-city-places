@@ -18,7 +18,7 @@ var geocoder = NodeGeocoder(options)
 router.get("/:city/places/getPlaces", (req, res) => {
 
     var city = req.params.city;
-    var cityCap = toTitleCase(city);
+    var cityCap = city.toLowerCase();
 
     if(req.query.category && req.query.search)  {
 
@@ -30,15 +30,13 @@ router.get("/:city/places/getPlaces", (req, res) => {
                     console.log(err);
                 }
                 else {
-                    
                     if(places.length<=0){
                         req.flash("warning", "No places matched");
                         res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
                     }
                     else {
                         res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-                    }
-    
+                    }    
                 }
             });
         } else {
@@ -132,18 +130,26 @@ router.get("/:city/places/getPlaces", (req, res) => {
 router.get("/:city/places",  (req, res) => {
 
     var city = req.params.city;
-    var cityCap = toTitleCase(city);
 
-    Place.find({"city": city}, function(err, places){
-        if(err){
+    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+        if (!err) {
+            console.log("OK HERE");
+            var cityCap = geores[0].formattedAddress;
+            console.log(geores[0].formattedAddress);
+
+            Place.find({"city": city}, function(err, places){
+                if(err){
+                    console.log(err);
+                }
+                else {
+                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                }
+            })
+        }else{
             console.log(err);
         }
-        else {
+    });
 
-            res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-
-        }
-    })
 });
 
 router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
@@ -202,13 +208,22 @@ router.get("/:city/places/new", middleware.isLoggedIn, (req, res) => {
 });
 
 router.get("/:city/places/:id", function(req, res){
-    var city = toTitleCase(req.params.city);
-    Place.findById(req.params.id).populate("comments").exec(function(err, place){
-        if(err){
-            console.log(err);
-        }
-        else{
-            res.render("places/show", {place: place, cityTitle: city});
+    var city = req.params.city;
+
+    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+        if(!err) {
+            var cityTitle = geores[0].city;
+            Place.findById(req.params.id).populate("comments").exec(function(err, place){
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    res.render("places/show", {place: place, cityTitle: cityTitle});
+                }
+            });
+        }else{
+            console.log(err)
+            res.sendStatus(400);
         }
     });
 });

@@ -4,6 +4,7 @@
   "description": "Contains list of packages used in project.",
   "main": "app.js",
   "dependencies": {
+    "@google/maps": "^0.5.5",
     "async": "^2.6.1",
     "body-parser": "^1.18.3",
     "connect-flash": "^0.1.1",

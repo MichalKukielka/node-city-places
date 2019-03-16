@@ -24,7 +24,17 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-    res.redirect("/" + req.body.search.toLowerCase() + "/places")
+
+    geocoder.geocode(req.body.search, (err, data) => {
+
+        if(err || !data.length) {
+            req.flash("error", "City not found");
+            res.redirect("/");
+        } else {
+            console.log(data);
+            res.redirect("/" + data[0].extra.googlePlaceId + "/places");
+        }
+    });
 
 });
 
@@ -215,7 +225,6 @@ router.post("/password/reset/:token", (req, res) => {
         }
     ]);
 });
-
 
 module.exports = router
 

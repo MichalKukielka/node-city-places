@@ -10,11 +10,11 @@
                             <div class="row">
                                 <div class="col-md-9">
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-9">
                                             <h2 class="card-title text-primary"><%= place.name %></h2> 
                                             <h6 class="card-text float-left d-inline">Submitted by <a href="/users/<%= place.author.id %>"><%= place.author.username %></a>, <%= moment(place.createdAt).fromNow() %></h6>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-3">
                                             <% if(currentUser && place.author.id.equals(currentUser._id)) { %>
                                                 
                                                 <div class="col-sm-12 text-right">
@@ -203,12 +203,14 @@
                 addCommentToDB();
             });
 
-            document.getElementById("newComment").addEventListener("keyup", function(event) {
-                if (event.keyCode === 13) { //13 is Enter
-                    event.preventDefault();
-                    addCommentToDB();
-                }
-            });
+            if(document.getElementById("newComment") !== null) {
+                document.getElementById("newComment").addEventListener("keyup", function(event) {
+                    if (event.keyCode === 13) { //13 is Enter
+                        event.preventDefault();
+                        addCommentToDB();
+                    }
+                });
+            }
         });
 
         function webpageReady() { 

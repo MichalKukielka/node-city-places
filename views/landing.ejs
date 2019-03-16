@@ -4,7 +4,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="/stylesheets/landing.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiFuS0KDDIEwvyTyPUp_xI-ggvE0uQBk0&libraries=places"></script>
         <title>CityPlaces - App</title>
     </head>
     
@@ -16,11 +17,17 @@
                 <div class="card-body">
                     <h2 class="card-title">Welcome to CityPlaces!</h2>
                     <br>
+                    <% if(error && error.length > 0) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+            
                     <div class="row justify-content-center">
             
                             <form class="justify-content-center" action="/" method="POST">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder="Search"  aria-describedby="basic-addon2" name="search">
+                                    <input type="text" class="form-control" placeholder="Search" id="searchTextField" aria-describedby="basic-addon2" name="search">
                                     <div class="input-group-append">
                                         <button class="btn btn-success" type="submit">
                                             <i class="align-middle material-icons">search</i>
@@ -45,10 +52,27 @@
 
         </div>
         
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
+        <script>
+            $(document).ready(() => {
+                autocomplete();
+            });
 
+            function autocomplete() {
+                var input = document.getElementById('searchTextField');
+                var options = {
+                    types: ['(cities)']
+                };
+
+                autocomplete = new google.maps.places.Autocomplete(input, options);
+                autocomplete.addListener('place_changed', function() {
+                    var place = autocomplete.getPlace();
+                    var form = input.parentElement;
+                    console.log(place.place_id);
+                });
+            }
+        </script>
     </body>
 </html>
