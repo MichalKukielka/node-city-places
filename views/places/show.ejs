@@ -7,8 +7,6 @@
                     <div class="card border-light mb-3">
                         <img class="card-img-top" src="<%= place.image %>">
                         <div class="card-body">
-                            <h2 class="card-title text-primary"><%= place.name %></h2> 
-                            <div class="my-rating"></div>
                             <div class="row">
                                 <div class="col-6">
                                     <h6 class="card-text float-left d-inline">Submitted by <a href="/users/<%= place.author.id %>"><%= place.author.username %></a>, <%= moment(place.createdAt).fromNow() %></h6>
@@ -26,13 +24,29 @@
                                         </div>                                                                         
                                     <% } %>
 
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 rounded" style="background-color: rgb(77, 77, 77); color: white;">
+                                    <div id="rateField" class="m-1 text-center">
+                                        <div id="rateNum" style="font-size:24px;display: inline-block;"></div> <div id="numVotes" style="font-size:12px;display: inline-block;"></div>
+                                    </div>      
+                                    <div id="noVotes" class="m-1 text-center">
+                                        <i>No votes yet</i>
+                                    </div>
+                                    <div class="mb-2 rounded text-center" style="background-color: rgb(102, 102, 102);">
+                                        <% if(currentUser) { %>
+                                        Your vote:
+                                        <div class="my-rating mb-1" id="ratingStars"></div>
+                                        <% }else{ %>
+                                        Login to vote
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="container m-1">
+                                <p class="card-text text-justify"><%= place.description %></p>
                                 </div>
                             </div>
-                            
-                            
-                
-                            <p class="card-text text-justify"><%= place.description %></p>
-                            <p class="card-text text-justify"><%= place.category %></p>
                         </div>
                     </div>
 
@@ -63,9 +77,6 @@
 
             </div> 
         </div> 
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script type="text/javascript" src="/star-svg/src/jquery.star-rating-svg.js"></script>
-        <link rel="stylesheet" type="text/css" href="/star-svg/src/css/star-rating-svg.css">
 
         
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -83,6 +94,14 @@
             $("#commentEdit" + commentID).hide();
         };
 
+        function commentEditKeyUp(event, commentID) {
+            if (event.keyCode === 13) { //13 is Enter
+                approveEdit(commentID);
+            }else if(event.keyCode === 27) { //27 is Escape
+                discardEdit(commentID);
+            }
+        }
+
         function approveEdit(commentID) {
             $.ajax({
                 url: '/<%= place.city %>/places/<%= place.id %>/comments/' + commentID + '/?_method=PUT',
@@ -96,6 +115,51 @@
                 }
             });
         } 
+
+        function deleteRaitng() {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/deleteRating',
+                type: 'DELETE',
+                success: (data) => {
+                    getAvgRating();
+                }
+            });
+        }
+
+        function getUserRating() {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/rating',
+                type: 'GET',
+                dataType: 'json',
+                contentType: "application/json charset=utf-8",
+                success: (data) => {
+                    $(".my-rating").starRating('setRating', data.userRating.rating);
+                }
+            });
+        }
+
+        function getAvgRating() {
+            $.ajax({
+                url: '/<%= place.city %>/places/<%= place.id %>/avgRating',
+                type: 'GET',
+                dataType: 'json',
+                success: (data) => {
+                    if(data.length > 0) {
+                        $('#rateField').show();
+                        $('#noVotes').hide();
+                        document.getElementById("rateNum").innerHTML = Math.round(data[0].avg*100)/100 + ' <span style="color:yellow">&#9733;</span>';
+                        document.getElementById("numVotes").innerHTML = '/ ' +  data[0].count + (data[0].count == 1 ? 'vote' : ' votes');
+                    } else {
+                        $('#rateField').hide();
+                        $('#noVotes').show();
+                    }
+                }
+            });
+        }
+
+        function setRating(rating) {
+            $(".my-rating").starRating('setRating', rating);
+        }
 
         function loadComments() {
             $.ajax({
@@ -129,8 +193,6 @@
             });
         }
 
-        
-
         $(document).ready(() => {
 
             loadComments();
@@ -138,27 +200,40 @@
             $('#addCommentButton').click(() => {
                 addCommentToDB();
             });
-        });
 
-        function webpageReady() {
-            $(".my-rating").starRating({
-                starSize: 25,
-                disableAfterRate: false,
-                callback: function(currentRating, $el){
-                    console.log({'rating' : currentRating});
-                    $.ajax({
-                        url: '/<%= place.city %>/places/<%= place._id %>/setRating',
-                        type: 'POST',
-                        data: {'rating' : currentRating},
-                        success: (data) => {
-                            //document.getElementById("commentsPlaceholder").innerHTML = data;
-                        }
-                    }).done(function(response) {
-                            console.log(response);
-                    });
+            document.getElementById("newComment").addEventListener("keyup", function(event) {
+                if (event.keyCode === 13) { //13 is Enter
+                    event.preventDefault();
+                    addCommentToDB();
                 }
             });
-        }gi
+        });
+
+        function webpageReady() { 
+            if($(".my-rating").is(':visible')) {
+                
+                $(".my-rating").starRating({
+                    starSize: 20,
+                    disableAfterRate: false,
+                    callback: function(currentRating, $el){
+                        if(currentRating == 0) {
+                            deleteRaitng();
+                        }else{
+                            $.ajax({
+                                url: '/<%= place.city %>/places/<%= place._id %>/setRating',
+                                type: 'POST',
+                                data: {'rating' : currentRating},
+                                success: () => {
+                                    getAvgRating();
+                                }
+                            });
+                        }
+                    }
+                });
+                getUserRating();
+            }
+            getAvgRating();
+        }
 
                     function initMap() {
                         var lat = <%= place.lat %>;

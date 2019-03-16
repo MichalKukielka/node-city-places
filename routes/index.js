@@ -7,7 +7,16 @@ var express    = require("express"),
     crypto     = require('crypto')
     User       = require("../models/user"),
     Place      = require("../models/place");
+    NodeGeocoder = require('node-geocoder');
 
+var options = {
+    provider: "google",
+    httpAdapter: 'https',
+    apiKey: process.env.GEOCODER_API_KEY,
+    formatter: null
+}
+
+var geocoder = NodeGeocoder(options)
     
 router.get("/", (req, res) => {
     
