@@ -23,6 +23,12 @@ router.get("/:city/places/:id/avgRating", function (req, res) {
         {"$match": { "place": ObjectId(req.params.id)}},
         {$group: {_id: "$place", avg: {$avg: "$rating"}, count: {$sum: 1}}}
     ]).then(function(result) {
+        Place.findByIdAndUpdate(req.params.id, { ratingsAvg: Math.round(result[0].avg * 100)/100,
+                                                ratingsCount: result[0].count }, function(err, result){
+            if (err) {
+                console.log(err);
+            }
+        });
         res.send(result);
     })
 });

@@ -32,7 +32,17 @@ var placeSchema = new mongoose.Schema({
     ratings: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Rating"
-    }]
+    }],
+    
+
+    ratingsAvg: {
+        type: Number
+    },
+    
+    ratingsCount: {
+        type: Number
+    } 
+    
 });
 //TODO obecna wartosc ratingu
 module.exports = mongoose.model("Place", placeSchema);

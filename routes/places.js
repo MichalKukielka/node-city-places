@@ -17,115 +17,57 @@ var geocoder = NodeGeocoder(options)
 
 router.get("/:city/places/getPlaces", (req, res) => {
 
+    
     var city = req.params.city;
     var cityCap = toTitleCase(city);
+    var filterObj = {};
+    filterObj['city'] = city;
 
-    if(req.query.category && req.query.search)  {
-
-        if(req.query.category === 'All'){
-            const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-
-            Place.find({"city": city, "name": regex}, function(err, places){
-                if(err){
-                    console.log(err);
-                }
-                else {
-                    
-                    if(places.length<=0){
-                        req.flash("warning", "No places matched");
-                        res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-                    }
-                    else {
-                        res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-                    }
-    
-                }
-            });
-        } else {
-
-            const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-            Place.find({"city": city, 'category': req.query.category, 'name': regex}, function(err, places){
-                if(err){
-                    console.log(err);
-                }
-                else {
-    
-                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-    
-                }
-            });
-    
-
-        }
-
-
-
-    } else if(req.query.search){
-    
+    if(req.query.search != ''){
         const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-
-        Place.find({"city": city, "name": regex}, function(err, places){
-            if(err){
-                console.log(err);
-            }
-            else {
-                
-                if(places.length<=0){
-                    req.flash("warning", "No places matched");
-                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-                }
-                else {
-                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-                }
-
-            }
-        });
-    } else if(req.query.category)  {
-
-        if(req.query.category === 'All'){
-            Place.find({"city": city}, function(err, places){
-                if(err){
-                    console.log(err);
-                }
-                else {
-    
-                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-    
-                }
-            });
-
-        } else {
-
-
-        Place.find({"city": city, 'category': req.query.category}, function(err, places){
-            if(err){
-                console.log(err);
-            }
-            else {
-
-                res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-
-            }
-        });
-        }
-
-
-    } else  {
-        
-        Place.find({"city": city}, function(err, places){
-            if(err){
-                console.log(err);
-            }
-            else {
-
-                res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-
-            }
-        });
-
+        filterObj['name'] = regex;    
     }
 
+    if(req.query.category != ''){
+        filterObj['category'] = req.query.category;    
+    }
 
+    if(req.query.category == 'All'){
+        delete filterObj.category; 
+    }
+
+    
+    console.log(req.query.popularity)
+
+    Place.find(filterObj, function(err, places){
+        if(err){
+            console.log(err);
+        }
+        else {
+            
+            if(places.length<=0){
+                req.flash("warning", "No places matched");
+                res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+            }
+            else {
+
+                if (req.query.popularity == 'Rate'){
+
+                    places.sort((a,b) => (a.ratingsAvg > b.ratingsAvg) ? -1 : ((b.ratingsAvg > a.ratingsAvg) ? 1 : 0));
+                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    
+                } else if (req.query.popularity == 'Popularity'){
+
+                    places.sort((a,b) => (a.ratingsCount > b.ratingsCount) ? -1 : ((b.ratingsCount > a.ratingsCount) ? 1 : 0));
+                    res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    
+                } else {
+                res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                }
+            }
+
+        }
+    });
 
 });
 
