@@ -177,6 +177,8 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
 
     geocoder.geocode(req.body.location, function(err, data){
 
+        console.log(data)
+
         if(err || !data.length) {
             req.flash("error", "Invalid adress");
             return res.redirect("back");
