@@ -38,6 +38,18 @@
 
     </div>
 
+    <div class="col-md-2">
+    <div class="input-group mb-3">
+            <select class="custom-select mr-sm-2" id="popularity" onchange="loadPlaces()">
+                    <option disabled selected value="Off">Filtration</option>
+                    <option value="Popularity" onclick="loadPlaces()">Popularity</option>
+                    <option value="Rate" onselect="loadPlaces()">Rate</option>
+                    <option value="Off" onselect="loadPlaces()">Off</option>
+            </select>
+    </div>
+
+</div>
+
 </div>
     <div id="PlacesList">
 
@@ -55,7 +67,7 @@
                 dataType: 'html',
                 data: {'search' : $('#searchExp').val(),
                         'category': $('#category').val(),
-            
+                        'popularity': $('#popularity').val(),
                     },
                     
                 success: (data) => {

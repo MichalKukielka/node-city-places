@@ -24,10 +24,6 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-
-    console.log("====================================================");
-    console.log(req.body);
-    console.log("====================================================");
     geocoder.geocode({address: req.body.search}, (err, data) => {
 
         if(err || !data.length) {
@@ -85,36 +81,6 @@ router.get("/logout", (req, res) => {
     req.logout();
     req.flash("success", "Logged You Out!")
     res.redirect("/");
-});
-
-// USER PROFILE
-
-router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
-    
-    geocoder.geocode('biezanowska, krakow', (err, data) => {
-        if(!err){
-            console.log(data);
-        }else{
-            console.log(err);
-        }
-    });
-
-    User.findById(req.params.id, function (err, user){
-        
-        if(err){
-            req.flash("error", "Something went wrong.");
-            return res.redirect("/")
-        }
-        Place.find().where('author.id').equals(user._id).exec(function(err, places) {
-            if(err) {
-                req.flash("error", "Something went wrong.");
-                return res.redirect("/");
-            }
-            res.render("users/show", {user: user, places: places});
-         
-        })
-    });
-
 });
 
 router.get("/password/reset",  (req, res) => {
@@ -237,6 +203,48 @@ router.post("/password/reset/:token", (req, res) => {
         }
     ]);
 });
+
+router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
+    
+    User.findById(req.params.id, function (err, user){
+        
+        if(err){
+            req.flash("error", "Something went wrong.");
+            return res.redirect("/")
+        }
+        Place.find().where('author.id').equals(user._id).exec(function(err, places) {
+            if(err) {
+                req.flash("error", "Something went wrong.");
+                return res.redirect("/");
+            } else {
+                
+                var gPlaces = geocodePlaces(places, 0, res, user);
+
+            }  
+        })
+    });
+
+});
+
+function geocodePlaces(geoPlaces, i, res, user) {
+    console.log(i);
+    geocoder.geocode({googlePlaceId: geoPlaces[i].city}, (err, data) => {
+        if(!err) {
+            geoPlaces[i].city = data[0].formattedAddress;
+        } else {
+            geoPlaces[i].city = geoPlaces[i].city;
+            console.log(err);
+        }
+        
+        if(i == geoPlaces.length - 1) {]
+            res.render("users/show", {user: user, places: geoPlaces});
+            //return geoPlaces;
+        } else {
+            geocodePlaces(geoPlaces, i+1, res, user);
+        }
+    })
+}
+
 
 module.exports = router
 

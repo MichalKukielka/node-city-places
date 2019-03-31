@@ -8,10 +8,22 @@
             <div class="col-md-4 col-sm-6">
                     <div class="card">
                         <img class="card-img-top" src="<%= place.image %>" >  
-                        <div class="card-body">
-                            <h5 class="card-title"><%= place.name %></h5>
+                        <div class="card-body bg-light justify-content-center">
+                            <h3 class="card-title d-inline text-align-right"><a href="places/<%= place._id %>"><%= place.name %></a></h3>
+
+                                        <% if(place.ratingsCount != undefined) { %>
+                                            <p class=" small d-inline-flex float-right pt-2"><%= place.ratingsAvg %> <span style="color:yellow">&#9733;</span> / <%= place.ratingsCount %></p>
+        
+                                        <% } else { %>
+                                            <p class=" small d-inline-flex float-right pt-2 ">No ratings</p>
+                                        <% } %> 
+
+                                        
                         </div>
-                        <p><a href="places/<%= place._id %>" class="btn btn-primary">More info</a></p> 
+                    
+
+
+
                     </div>
             </div>
         <% }); %>
