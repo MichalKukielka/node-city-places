@@ -25,7 +25,10 @@ router.get("/", (req, res) => {
 
 router.post("/", (req, res) => {
 
-    geocoder.geocode(req.body.search, (err, data) => {
+    console.log("====================================================");
+    console.log(req.body);
+    console.log("====================================================");
+    geocoder.geocode({address: req.body.search}, (err, data) => {
 
         if(err || !data.length) {
             req.flash("error", "City not found");
@@ -88,6 +91,14 @@ router.get("/logout", (req, res) => {
 
 router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
     
+    geocoder.geocode('biezanowska, krakow', (err, data) => {
+        if(!err){
+            console.log(data);
+        }else{
+            console.log(err);
+        }
+    });
+
     User.findById(req.params.id, function (err, user){
         
         if(err){
@@ -100,7 +111,8 @@ router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
                 return res.redirect("/");
             }
             res.render("users/show", {user: user, places: places});
-            })
+         
+        })
     });
 
 });

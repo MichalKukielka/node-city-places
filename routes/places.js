@@ -164,38 +164,48 @@ router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
         username: req.user.username
     };
 
-    geocoder.geocode(req.body.location, (err, data) => {
-
-        if(err || !data.length) {
+    geocoder.geocode({googlePlaceId: city}, (err, cityData) => {
+        
+        if(err || !cityData.length) {
             req.flash("error", "Invalid adress");
             return res.redirect("back");
-        }   
+        } else {
+            geocoder.geocode(req.body.location + ", " + cityData[0].formattedAddress, (err, data) => {
 
-        var lat = data[0].latitude;
-        var lng = data[0].longitude;
-        var location = data[0].formattedAddress;
-
-
-        var newPlace = {
-            city: city, 
-            name: name, 
-            image: image,
-            description: description,
-            author: author,
-            lat: lat,
-            lng: lng,
-            location: location,
-            category: category
-        };
+                if(err || !data.length) {
+                    req.flash("error", "Invalid adress");
+                    return res.redirect("back");
+                }   
         
-        Place.create(newPlace, function(err, place){
-            if(err){
-                console.log(err);
-            }
-            else {
-                res.redirect("/" + place.city + "/places")
-            }
-        });
+                var lat = data[0].latitude;
+                var lng = data[0].longitude;
+                var location = data[0].formattedAddress;
+        
+        
+                var newPlace = {
+                    city: city, 
+                    name: name, 
+                    image: image,
+                    description: description,
+                    author: author,
+                    lat: lat,
+                    lng: lng,
+                    location: location,
+                    category: category
+                };
+                
+                Place.create(newPlace, function(err, place){
+                    if(err){
+                        console.log(err);
+                    }
+                    else {
+                        res.redirect("/" + place.city + "/places")
+                    }
+                });
+        
+            });
+
+        }
 
     });
 
