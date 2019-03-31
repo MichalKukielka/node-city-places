@@ -236,7 +236,7 @@ function geocodePlaces(geoPlaces, i, res, user) {
             console.log(err);
         }
         
-        if(i == geoPlaces.length - 1) {]
+        if(i == geoPlaces.length - 1) {
             res.render("users/show", {user: user, places: geoPlaces});
             //return geoPlaces;
         } else {
