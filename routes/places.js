@@ -74,18 +74,26 @@ router.get("/:city/places/getPlaces", (req, res) => {
 router.get("/:city/places",  (req, res) => {
 
     var city = req.params.city;
-    var cityCap = toTitleCase(city);
 
-    Place.find({"city": city}, function(err, places){
-        if(err){
+    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+        if (!err) {
+            console.log("OK HERE");
+            var cityCap = geores[0].formattedAddress;
+            console.log(geores[0].formattedAddress);
+
+            Place.find({"city": city}, function(err, places){
+                if(err){
+                    console.log(err);
+                }
+                else {
+                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                }
+            })
+        }else{
             console.log(err);
         }
-        else {
+    });
 
-            res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-
-        }
-    })
 });
 
 router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
@@ -100,38 +108,48 @@ router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
         username: req.user.username
     };
 
-    geocoder.geocode(req.body.location, (err, data) => {
-
-        if(err || !data.length) {
+    geocoder.geocode({googlePlaceId: city}, (err, cityData) => {
+        
+        if(err || !cityData.length) {
             req.flash("error", "Invalid adress");
             return res.redirect("back");
-        }   
+        } else {
+            geocoder.geocode(req.body.location + ", " + cityData[0].formattedAddress, (err, data) => {
 
-        var lat = data[0].latitude;
-        var lng = data[0].longitude;
-        var location = data[0].formattedAddress;
-
-
-        var newPlace = {
-            city: city, 
-            name: name, 
-            image: image,
-            description: description,
-            author: author,
-            lat: lat,
-            lng: lng,
-            location: location,
-            category: category
-        };
+                if(err || !data.length) {
+                    req.flash("error", "Invalid adress");
+                    return res.redirect("back");
+                }   
         
-        Place.create(newPlace, function(err, place){
-            if(err){
-                console.log(err);
-            }
-            else {
-                res.redirect("/" + place.city + "/places")
-            }
-        });
+                var lat = data[0].latitude;
+                var lng = data[0].longitude;
+                var location = data[0].formattedAddress;
+        
+        
+                var newPlace = {
+                    city: city, 
+                    name: name, 
+                    image: image,
+                    description: description,
+                    author: author,
+                    lat: lat,
+                    lng: lng,
+                    location: location,
+                    category: category
+                };
+                
+                Place.create(newPlace, function(err, place){
+                    if(err){
+                        console.log(err);
+                    }
+                    else {
+                        res.redirect("/" + place.city + "/places")
+                    }
+                });
+        
+            });
+
+        }
 
     });
 
@@ -144,13 +162,22 @@ router.get("/:city/places/new", middleware.isLoggedIn, (req, res) => {
 });
 
 router.get("/:city/places/:id", function(req, res){
-    var city = toTitleCase(req.params.city);
-    Place.findById(req.params.id).populate("comments").exec(function(err, place){
-        if(err){
-            console.log(err);
-        }
-        else{
-            res.render("places/show", {place: place, cityTitle: city});
+    var city = req.params.city;
+
+    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+        if(!err) {
+            var cityTitle = geores[0].city;
+            Place.findById(req.params.id).populate("comments").exec(function(err, place){
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    res.render("places/show", {place: place, cityTitle: cityTitle});
+                }
+            });
+        }else{
+            console.log(err)
+            res.sendStatus(400);
         }
     });
 });

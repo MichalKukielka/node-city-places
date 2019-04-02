@@ -24,7 +24,16 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-    res.redirect("/" + req.body.search.toLowerCase() + "/places")
+    geocoder.geocode({address: req.body.search}, (err, data) => {
+
+        if(err || !data.length) {
+            req.flash("error", "City not found");
+            res.redirect("/");
+        } else {
+            console.log(data);
+            res.redirect("/" + data[0].extra.googlePlaceId + "/places");
+        }
+    });
 
 });
 
@@ -73,27 +82,6 @@ router.get("/logout", (req, res) => {
     req.flash("success", "Logged You Out!")
     res.redirect("/");
 });
-
-// USER PROFILE
-
-// router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
-    
-//     User.findById(req.params.id, function (err, user){
-        
-//         if(err){
-//             req.flash("error", "Something went wrong.");
-//             return res.redirect("/")
-//         }
-//         Place.find().where('author.id').equals(user._id).exec(function(err, places) {
-//             if(err) {
-//                 req.flash("error", "Something went wrong.");
-//                 return res.redirect("/");
-//             }
-//             res.render("users/show", {user: user, places: places});
-//             })
-//     });
-
-// });
 
 router.get("/password/reset",  (req, res) => {
     res.render('forgot');

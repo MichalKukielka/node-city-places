@@ -4,7 +4,8 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
         <link rel="stylesheet" href="/stylesheets/landing.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCiFuS0KDDIEwvyTyPUp_xI-ggvE0uQBk0&libraries=places"></script>
         <title>CityPlaces - App</title>
     </head>
     
@@ -16,18 +17,19 @@
                 <div class="card-body">
                     <h2 class="card-title">Welcome to CityPlaces!</h2>
                     <br>
+                    <% if(error && error.length > 0) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= error %>
+                        </div>
+                    <% } %>
+            
                     <div class="row justify-content-center">
             
-                            <form class="justify-content-center" action="/" method="POST">
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder="Search"  aria-describedby="basic-addon2" name="search">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-success" type="submit">
-                                            <i class="align-middle material-icons">search</i>
-                                        </button>
-                                    </div>
+                            <!-- <form id="form" action="/" method="POST" onsubmit="getCity()"> -->
+                                <div class="input-group mb-3 ml-3 mr-3">
+                                    <input type="text" class="form-control" placeholder="Search" id="searchTextField" aria-describedby="basic-addon2" name="search">
                                 </div>
-                            </form>
+                            <!-- </form> -->
                         
             
                     </div>
@@ -45,10 +47,95 @@
 
         </div>
         
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
+        <script>
+            $(document).ready(() => {
+                autocomplete();
 
+            });
+
+
+            function postData(city) {
+                var form = document.createElement("form");
+                document.body.appendChild(form);
+                form.method = "POST";
+                form.action = "/";
+                var element1 = document.createElement("INPUT");         
+                    element1.name="search"
+                    element1.value = city;
+                    element1.type = 'hidden'
+                    form.appendChild(element1);
+                    form.submit();
+            }
+
+            function autocomplete() {
+
+                var input = /** @type {HTMLInputElement} */(document.getElementById('searchTextField'));
+                var autocomplete = new google.maps.places.Autocomplete(input);  
+                // These are my options for the AutoComplete
+                autocomplete.setTypes(['(cities)']);
+
+                google.maps.event.addListener(autocomplete, 'place_changed', function() {
+                    var result = autocomplete.getPlace();
+                    //var form = input.parentElement;
+                    //console.log(place.formatted_address);
+                    if(typeof result.address_components == 'undefined') {
+                        // The user pressed enter in the input 
+                        // without selecting a result from the list
+                        // Let's get the list from the Google API so that
+                        // we can retrieve the details about the first result
+                        // and use it (just as if the user had actually selected it)
+                        autocompleteService = new google.maps.places.AutocompleteService();
+                        autocompleteService.getPlacePredictions(
+                            {
+                                'input': result.name,
+                                'offset': result.name.length,
+                                // I repeat the options for my AutoComplete here to get
+                                // the same results from this query as I got in the 
+                                // AutoComplete widget
+                                'types': ['(cities)']
+                            },
+                            function listentoresult(list, status) {
+                                if(list == null || list.length == 0) {
+                                    // There are no suggestions available.
+                                    // The user saw an empty list and hit enter.
+                                    console.log("No results");
+                                } else {
+                                    // Here's the first result that the user saw
+                                    // in the list. We can use it and it'll be just
+                                    // as if the user actually selected it
+                                    // themselves. But first we need to get its details
+                                    // to receive the result on the same format as we
+                                    // do in the AutoComplete.
+                                    placesService = new google.maps.places.PlacesService(document.getElementById('searchTextField'));
+                                    placesService.getDetails(
+                                        {'reference': list[0].reference},
+                                        function detailsresult(detailsResult, placesServiceStatus) {
+                                            // Here's the first result in the AutoComplete with the exact
+                                            // same data format as you get from the AutoComplete.
+                                            console.log("We selected the first item from the list automatically because the user didn't select anything");
+                                            console.log(detailsResult.formatted_address);
+                                            $('#searchTextField').val(detailsResult.formatted_address);
+                                            postData(detailsResult.formatted_address);
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    } else {
+                        // The user selected a result from the list, we can 
+                        // proceed and use it right away
+                        console.log("User selected an item from the list");
+                        console.log(result.formatted_address);
+                        postData(result.formatted_address);
+                    }
+                });
+            }
+            
+
+            
+        </script>
     </body>
 </html>
