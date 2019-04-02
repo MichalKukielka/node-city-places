@@ -1,8 +1,9 @@
 var express      = require("express"),
     router       = express.Router(),
     middleware   = require('../middleware/index'),
+    multer       = require("multer"),
+    cloudinary   = require('cloudinary'),
     Place        = require("../models/place"),
-    Comment        = require("../models/comment"),
     NodeGeocoder = require('node-geocoder');
 
 var options = {
@@ -11,6 +12,28 @@ var options = {
     apiKey: process.env.GEOCODER_API_KEY,
     formatter: null
 }
+
+var storage = multer.diskStorage({
+    filename: function(req, file, callback) {
+        callback(null, Date.now() + file.originalname);
+    }
+});
+
+var imageFilter = function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+};
+
+
+cloudinary.config({ 
+    cloud_name: 'detqebtd3', 
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+var upload = multer({ storage: storage, fileFilter: imageFilter})
 
 var geocoder = NodeGeocoder(options)
 
@@ -96,11 +119,12 @@ router.get("/:city/places",  (req, res) => {
 
 });
 
-router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
+router.post("/:city/places", middleware.isLoggedIn, upload.single('image'), (req, res) => {
+
+
 
     var city = req.params.city;
     var name = req.body.name;
-    var image = req.body.image;
     var description = req.body.description;
     var category = req.body.category;
     var author = {
@@ -124,12 +148,11 @@ router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
                 var lat = data[0].latitude;
                 var lng = data[0].longitude;
                 var location = data[0].formattedAddress;
-        
+                
         
                 var newPlace = {
                     city: city, 
-                    name: name, 
-                    image: image,
+                    name: name,
                     description: description,
                     author: author,
                     lat: lat,
@@ -137,14 +160,21 @@ router.post("/:city/places", middleware.isLoggedIn, (req, res) => {
                     location: location,
                     category: category
                 };
-                
-                Place.create(newPlace, function(err, place){
-                    if(err){
-                        console.log(err);
-                    }
-                    else {
-                        res.redirect("/" + place.city + "/places")
-                    }
+
+                cloudinary.uploader.upload(req.file.path, function(result) {
+                    // add cloudinary url for the image to the campground object under image property
+                    newPlace.image = result.secure_url;
+                    console.log(newPlace)
+
+                    Place.create(newPlace, function(err, place){
+                        if(err){
+                            console.log(err);
+                        }
+                        else {
+                            res.redirect("/" + place.city + "/places")
+                        }
+                    });
+
                 });
         
             });
@@ -199,7 +229,7 @@ router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, (req, res) 
 });
 
 // UPDATE PLACE ROUTE
-router.put("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
+router.put("/:city/places/:id", middleware.checkPlaceOwnership, upload.single('image'), (req, res) => {
 
 
     geocoder.geocode(req.body.location, function(err, data){
@@ -219,12 +249,19 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
         req.body.place.lng = lng;
         req.body.place.location = location;
 
-        Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
-            if(err){
-                res.redirect("/" + updatedPlace.city + "/places");
-            } else {
-                res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
-            }
+        cloudinary.uploader.upload(req.file.path, function(result) {
+            // add cloudinary url for the image to the campground object under image property
+            req.body.place.image = result.secure_url;
+            console.log(req.body.place)
+
+            Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
+                if(err){
+                    res.redirect("/" + updatedPlace.city + "/places");
+                } else {
+                    res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
+                }
+            });
+
         });
 
     });
