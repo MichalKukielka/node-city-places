@@ -69,16 +69,6 @@ router.get("/login", (req, res) => {
     res.render("login");
 });
 
-// router.post('/login', function (req, res, next) {
-//     passport.authenticate("local",
-//     {
-//         successRedirect:  req.session.redirectUrl ?  req.session.redirectUrl : '/',
-//         failureRedirect: "/login",
-//         failureFlash: true
-
-//     })(req, res, next);
-
-// });
 
 router.post('/login', function (req, res, next) {
     passport.authenticate('local', function (err, user, info) {
