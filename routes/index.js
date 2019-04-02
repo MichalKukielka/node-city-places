@@ -1,13 +1,13 @@
-var express    = require("express"),
-    router     = express.Router(),
-    passport   = require("passport"),
+var express = require("express"),
+    router = express.Router(),
+    passport = require("passport"),
     middleware = require('../middleware/index'),
-    async      = require('async'),
+    async = require('async'),
     nodemailer = require('nodemailer'),
-    crypto     = require('crypto')
-    User       = require("../models/user"),
-    Place      = require("../models/place");
-    NodeGeocoder = require('node-geocoder');
+    crypto = require('crypto')
+User = require("../models/user"),
+    Place = require("../models/place");
+NodeGeocoder = require('node-geocoder');
 
 var options = {
     provider: "google",
@@ -17,16 +17,16 @@ var options = {
 }
 
 var geocoder = NodeGeocoder(options)
-    
+
 router.get("/", (req, res) => {
-    
+
     res.render("landing");
 });
 
 router.post("/", (req, res) => {
-    geocoder.geocode({address: req.body.search}, (err, data) => {
+    geocoder.geocode({ address: req.body.search }, (err, data) => {
 
-        if(err || !data.length) {
+        if (err || !data.length) {
             req.flash("error", "City not found");
             res.redirect("/");
         } else {
@@ -50,12 +50,12 @@ router.post("/register", (req, res) => {
         last_name: req.body.lastName,
         email: req.body.email,
     });
-    User.register(newUser, req.body.password, function(err, user){
-        if(err){
+    User.register(newUser, req.body.password, function (err, user) {
+        if (err) {
             req.flash("error", err.message + ".");
             return res.render("register")
         }
-        passport.authenticate("local")(req, res, function(){
+        passport.authenticate("local")(req, res, function () {
             req.flash("success", "Welcome to CityPlaces: " + user.username);
             res.redirect("/");
         });
@@ -65,15 +65,44 @@ router.post("/register", (req, res) => {
 // LOGIN FORM
 
 router.get("/login", (req, res) => {
-
+    
     res.render("login");
 });
 
-router.post("/login", passport.authenticate("local", 
-    {
-        successRedirect: "/",
-        failureRedirect: "/login"
-    }), function(req, res){ });
+// router.post('/login', function (req, res, next) {
+//     passport.authenticate("local",
+//     {
+//         successRedirect:  req.session.redirectUrl ?  req.session.redirectUrl : '/',
+//         failureRedirect: "/login",
+//         failureFlash: true
+
+//     })(req, res, next);
+
+// });
+
+router.post('/login', function (req, res, next) {
+    passport.authenticate('local', function (err, user, info) {
+        var redirectUrl = '/';
+
+        if(err) {
+            req.flash('error','Invalid username or password');
+            res.redirect('/login');
+        }
+
+        if (!user) {
+            req.flash('error', 'Invalid username or password');
+            res.redirect('/login');
+        }
+        if (req.session.redirectUrl) {
+            redirectUrl = req.session.redirectUrl;
+            req.session.redirectUrl = null;
+        }
+        req.logIn(user, function (err) {
+            if (err) { return next(err); }
+        });
+        res.redirect(redirectUrl);
+    })(req, res, next);
+});
 
 // LOGOUT LOGIC ROUTE
 
@@ -83,21 +112,21 @@ router.get("/logout", (req, res) => {
     res.redirect("/");
 });
 
-router.get("/password/reset",  (req, res) => {
+router.get("/password/reset", (req, res) => {
     res.render('forgot');
 });
 
 router.post("/password/reset", (req, res, next) => {
 
     async.waterfall([
-        function(done){
-            crypto.randomBytes(20, function(err, buf){
+        function (done) {
+            crypto.randomBytes(20, function (err, buf) {
                 var token = buf.toString('hex');
                 done(err, token);
             });
         },
-        function(token, done){
-            User.findOne({email: req.body.email}, function(err, user){
+        function (token, done) {
+            User.findOne({ email: req.body.email }, function (err, user) {
                 if (!user) {
                     req.flash("error", "No account with that email exists.");
                     return res.redirect('/password/reset');
@@ -106,12 +135,12 @@ router.post("/password/reset", (req, res, next) => {
                 user.resetPasswordToken = token;
                 user.resetPasswordExpires = Date.now() + 3600000;
 
-                user.save(function(err) {
+                user.save(function (err) {
                     done(err, token, user);
                 });
             });
         },
-        function(token, user, done) {
+        function (token, user, done) {
             var smtpTransport = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
@@ -123,16 +152,16 @@ router.post("/password/reset", (req, res, next) => {
                 to: user.email,
                 from: 'aghwowlegion@gmail.com',
                 subject: 'CityPlaces - reset password',
-                text: 'http://' + req.headers.host + '/password/reset/' + token  
+                text: 'http://' + req.headers.host + '/password/reset/' + token
             };
-            smtpTransport.sendMail(mailOptions, function(err) {
+            smtpTransport.sendMail(mailOptions, function (err) {
                 console.log('Mail sent!')
                 req.flash("success", "An email has been sent to " + user.email + ' with further instructions.');
                 done(err, 'done');
             });
         }
-    ], function(err) {
-        if(err){
+    ], function (err) {
+        if (err) {
             req.flash("error", "Something has gone wrong.");
             return next(err);
         }
@@ -144,31 +173,31 @@ router.post("/password/reset", (req, res, next) => {
 
 router.get("/password/reset/:token", (req, res) => {
 
-    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
-        if(!user){
+    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function (err, user) {
+        if (!user) {
             req.flash("error", "Password reset token is invalid or expired.");
             return res.redirect('/password/reset');
         }
     });
 
-        res.render('reset', {token: req.params.token});
+    res.render('reset', { token: req.params.token });
 });
 
 router.post("/password/reset/:token", (req, res) => {
     async.waterfall([
-        function(done){
-            User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
-                if(!user){
+        function (done) {
+            User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function (err, user) {
+                if (!user) {
                     req.flash("error", "Password reset token is invalid or expired.");
                     return res.redirect('back');
                 }
-                if(req.body.password === req.body.confirm) {
-                    user.setPassword(req.body.password, function(err){
+                if (req.body.password === req.body.confirm) {
+                    user.setPassword(req.body.password, function (err) {
                         user.resetPasswordToken = undefined;
                         user.resetPasswordExpires = undefined;
 
-                        user.save(function(err){
-                            req.login(user, function(err){
+                        user.save(function (err) {
+                            req.login(user, function (err) {
                                 done(err, user);
                             });
                         });
@@ -179,7 +208,7 @@ router.post("/password/reset/:token", (req, res) => {
                 }
             });
         },
-        function(user, done){
+        function (user, done) {
             var smtpTransport = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
@@ -191,56 +220,56 @@ router.post("/password/reset/:token", (req, res) => {
                 to: user.email,
                 from: 'aghwowlegion@gmail.com',
                 subject: 'CityPlaces - your password has been changed',
-                text: 'Confirmation message: ' + user.email 
+                text: 'Confirmation message: ' + user.email
             };
-            smtpTransport.sendMail(mailOptions, function(err) {
+            smtpTransport.sendMail(mailOptions, function (err) {
                 console.log('Mail sent!')
                 req.flash("success", "Your password has been changed.");
                 done(err);
             });
-        }, function(err){
+        }, function (err) {
             res.redirect("/");
         }
     ]);
 });
 
 router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
-    
-    User.findById(req.params.id, function (err, user){
-        
-        if(err){
+
+    User.findById(req.params.id, function (err, user) {
+
+        if (err) {
             req.flash("error", "Something went wrong.");
             return res.redirect("/")
         }
-        Place.find().where('author.id').equals(user._id).exec(function(err, places) {
-            if(err) {
+        Place.find().where('author.id').equals(user._id).exec(function (err, places) {
+            if (err) {
                 req.flash("error", "Something went wrong.");
                 return res.redirect("/");
             } else {
-                
-                var gPlaces = geocodePlaces(places, 0, res, user);
 
-            }  
+                if(places.length == 0) res.render("users/show", {user: user, places: places});
+                else geocodePlaces(places, 0, res, user);
+
+            }
         })
     });
 
 });
 
 function geocodePlaces(geoPlaces, i, res, user) {
-    console.log(i);
-    geocoder.geocode({googlePlaceId: geoPlaces[i].city}, (err, data) => {
-        if(!err) {
+    geocoder.geocode({ googlePlaceId: geoPlaces[i].city }, (err, data) => {
+        if (!err) {
             geoPlaces[i].city = data[0].formattedAddress;
         } else {
             geoPlaces[i].city = geoPlaces[i].city;
             console.log(err);
         }
-        
-        if(i == geoPlaces.length - 1) {
-            res.render("users/show", {user: user, places: geoPlaces});
+
+        if (i == geoPlaces.length - 1) {
+            res.render("users/show", { user: user, places: geoPlaces });
             //return geoPlaces;
         } else {
-            geocodePlaces(geoPlaces, i+1, res, user);
+            geocodePlaces(geoPlaces, i + 1, res, user);
         }
     })
 }
