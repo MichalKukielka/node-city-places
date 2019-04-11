@@ -107,10 +107,8 @@ router.get("/:city/places",  (req, res) => {
 
         geocoder.geocode({googlePlaceId: city}, function(err, geores) {
             if (!err) {
-                console.log("OK HERE");
                 var cityCap = geores[0].formattedAddress;
-                console.log(geores[0].formattedAddress);
-
+                
                 Place.find({"city": city}, function(err, places){
                     if(err){
                         console.log(err);
@@ -169,7 +167,7 @@ router.post("/:city/places", middleware.isLoggedIn, upload.single('image'), (req
                 cloudinary.uploader.upload(req.file.path, function(result) {
                     // add cloudinary url for the image to the campground object under image property
                     newPlace.image = result.secure_url;
-                    console.log(newPlace)
+                
 
                     Place.create(newPlace, function(err, place){
                         if(err){
@@ -274,8 +272,7 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, upload.single('i
         cloudinary.uploader.upload(req.file.path, function(result) {
             // add cloudinary url for the image to the campground object under image property
             req.body.place.image = result.secure_url;
-            console.log(req.body.place)
-
+    
             Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
                 if(err){
                     res.redirect("/" + updatedPlace.city + "/places");
