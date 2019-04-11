@@ -42,7 +42,7 @@
                                         Your vote:
                                         <div class="my-rating mb-1" id="ratingStars"></div>
                                         <% }else{ %>
-                                            <a href="/login">Login</a>
+                                            <button type="button" class="btn btn-link btn-sm text-light" onclick="login()">Login to vote</button>
                                         <% } %>
                                     </div>
                                 </div>
@@ -84,6 +84,10 @@
         
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
     <script>
+
+        function login() {
+            console.log(window.location.href + "?login=true");
+        }
 
         function editComment(commentID) {
             $("#commentText" + commentID).hide();

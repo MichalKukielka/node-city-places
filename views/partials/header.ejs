@@ -37,7 +37,7 @@
 
                     <% if(!currentUser) { %>
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Login</a>
+                            <a class="nav-link"  href="#" id="loginLink">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/register">Sign Up</a>
@@ -75,3 +75,9 @@
                 <%= warning %>
             </div>
         <% } %>
+
+        <script type="text/javascript">
+            window.onload = function(){
+                document.getElementById("loginLink").href = window.location.toString() + "?login=true";
+            }
+        </script>

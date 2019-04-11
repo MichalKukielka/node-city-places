@@ -96,32 +96,37 @@ router.get("/:city/places/getPlaces", (req, res) => {
 
 router.get("/:city/places",  (req, res) => {
 
-    var city = req.params.city;
+    var doLogin = req.query.login;
+    if(doLogin == "true") {
+        const url = require('url');
+        req.session.redirectUrl = url.parse(req.url).pathname;
+        res.redirect('/login');
+    }else{
 
-    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
-        if (!err) {
-            console.log("OK HERE");
-            var cityCap = geores[0].formattedAddress;
-            console.log(geores[0].formattedAddress);
+        var city = req.params.city;
 
-            Place.find({"city": city}, function(err, places){
-                if(err){
-                    console.log(err);
-                }
-                else {
-                    res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
-                }
-            })
-        }else{
-            console.log(err);
-        }
-    });
+        geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+            if (!err) {
+                console.log("OK HERE");
+                var cityCap = geores[0].formattedAddress;
+                console.log(geores[0].formattedAddress);
 
+                Place.find({"city": city}, function(err, places){
+                    if(err){
+                        console.log(err);
+                    }
+                    else {
+                        res.render("places/places", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
+                    }
+                })
+            }else{
+                console.log(err);
+            }
+        });
+    }
 });
 
 router.post("/:city/places", middleware.isLoggedIn, upload.single('image'), (req, res) => {
-
-
 
     var city = req.params.city;
     var name = req.body.name;
@@ -192,24 +197,41 @@ router.get("/:city/places/new", middleware.isLoggedIn, (req, res) => {
 });
 
 router.get("/:city/places/:id", function(req, res){
-    var city = req.params.city;
 
-    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
-        if(!err) {
-            var cityTitle = geores[0].city;
-            Place.findById(req.params.id).populate("comments").exec(function(err, place){
-                if(err){
-                    console.log(err);
-                }
-                else{
-                    res.render("places/show", {place: place, cityTitle: cityTitle});
+    var doLogin = req.query.login;
+    if(doLogin == "true") {
+        const url = require('url');
+        req.session.redirectUrl = url.parse(req.url).pathname;
+        res.redirect('/login');
+    }else{
+
+        var doLogin = req.query.login;
+        if(doLogin == "true") {
+            const url = require('url');
+            req.session.redirectUrl = url.parse(req.url).pathname;
+            res.redirect('/login');
+        }else{
+
+            var city = req.params.city;
+
+            geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+                if(!err) {
+                    var cityTitle = geores[0].city;
+                    Place.findById(req.params.id).populate("comments").exec(function(err, place){
+                        if(err){
+                            console.log(err);
+                        }
+                        else{
+                            res.render("places/show", {place: place, cityTitle: cityTitle});
+                        }
+                    });
+                }else{
+                    console.log(err)
+                    res.sendStatus(400);
                 }
             });
-        }else{
-            console.log(err)
-            res.sendStatus(400);
         }
-    });
+    }
 });
 
 
