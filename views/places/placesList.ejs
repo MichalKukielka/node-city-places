@@ -1,24 +1,39 @@
+
 <% if(places && places.length > 0) { %>
-    <div class="col-lg-12 text-center">
-    </div>
-
-    <div class="row text-center">
-
+        <style>
+        .fit-image{
+width: 100%;
+object-fit: cover;
+height: 220px; /* only if you want fixed height */
+}
+    
+            
+        </style>
+        <div class="row text-center">
         <% places.forEach(function(place){ %>
             <div class="col-md-4 col-sm-6">
-                    <div class="card">
-                        <img class="card-img-top" src="<%= place.image %>" >  
+                    <div class="card mb-3">
+                        <img class="card-img-top fit-image" style="max-height: 220px" src="<%= place.image %>" >  
                         <div class="card-body bg-light justify-content-center">
                             <h3 class="card-title d-inline text-align-right"><a href="places/<%= place._id %>"><%= place.name %></a></h3>
 
-                                        <% if(place.ratingsCount != undefined) { %>
-                                            <p class=" small d-inline-flex float-right pt-2"><%= place.ratingsAvg %> <span style="color:yellow">&#9733;</span> / <%= place.ratingsCount %></p>
-        
-                                        <% } else { %>
-                                            <p class=" small d-inline-flex float-right pt-2 ">No ratings</p>
-                                        <% } %> 
 
                                         
+                        </div>
+                        <div class="card-footer bg-light text-muted pb-0 pt-0">
+                            
+                            <% if(place.ratingsCount != undefined) { %>
+                                <p class=" small mb-0"><%= place.ratingsAvg %> <span style="color:black">&#9733;</span> / <%= place.ratingsCount %>
+                                    <% if(place.ratingsCount == 1) { %>
+                                        vote
+                                    <% } else { %>
+                                        votes
+                                    <% } %>
+                                </p>
+
+                            <% } else { %>
+                                <p class=" small mb-0">No ratings</p>
+                            <% } %> 
                         </div>
                     
 
@@ -31,3 +46,4 @@
     </div>
 
 <% } %>
+

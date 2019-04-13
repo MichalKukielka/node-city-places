@@ -23,6 +23,8 @@ var imageFilter = function (req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
         return cb(new Error('Only image files are allowed!'), false);
     }
+
+
     cb(null, true);
 };
 
@@ -164,10 +166,15 @@ router.post("/:city/places", middleware.isLoggedIn, upload.single('image'), (req
                     category: category
                 };
 
-                cloudinary.uploader.upload(req.file.path, function(result) {
+                console.log('Czy')
+
+                cloudinary.v2.uploader.upload(req.file.path,function(error, result) { 
+                    console.log('wchodzi wgl')
+
                     // add cloudinary url for the image to the campground object under image property
                     newPlace.image = result.secure_url;
-                
+                    
+                    console.log('tutaj wgl')
 
                     Place.create(newPlace, function(err, place){
                         if(err){
