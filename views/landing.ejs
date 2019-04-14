@@ -25,17 +25,43 @@
             
                     <div class="row justify-content-center">
             
-                            <!-- <form id="form" action="/" method="POST" onsubmit="getCity()"> -->
-                                <div class="input-group mb-3 ml-3 mr-3">
-                                    <input type="text" class="form-control" placeholder="Search" id="searchTextField" aria-describedby="basic-addon2" name="search">
-                                </div>
-                            <!-- </form> -->
-                        
-            
+                        <div class="input-group mb-3 ml-3 mr-3">
+                            <input type="text" class="form-control" placeholder="Search" id="searchTextField" aria-describedby="basic-addon2" name="search">
+                        </div>
+
+                        <% if(currentUser) { %>
+
+                            <a class="text-muted pt-0" href="/logout">Logout</a>
+
+                        <% } %>
+                
                     </div>
+                    
                 </div>
             </div>
         </div>
+
+
+        <% if(!currentUser) { %>
+
+            <div id="landing-header2" class="justify-content-center">
+                <div class="card mx-auto" style="width:400px; background-color:rgba(255,255,255,0.85);">
+                    <div class="card-body">
+                
+                        <h6>Would You like to</h6>
+                        <div class="row justify-content-center pt-2">
+                            <a  class="btn btn-outline-dark" href="/login" >Login</a>               
+                        </div>
+                        <h6 class="pt-3">or</h6>
+                        <div class="row justify-content-center">
+                                <a class="text-muted pt-0" href="/register">Signup</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <% } %>
+
             
             <ul class="slideshow">
                 <li></li>
