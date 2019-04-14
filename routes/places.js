@@ -71,7 +71,6 @@ router.get("/:city/places/getPlaces", (req, res) => {
         else {
             
             if(places.length<=0){
-                req.flash("warning", "No places matched");
                 res.render("places/placesList", {places: places, city:city, cityCap:cityCap, currentUser: req.user});
             }
             else {

@@ -237,9 +237,15 @@ router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
                 return res.redirect("/");
             } else {
 
-                if(places.length == 0) res.render("users/show", {user: user, places: places});
-                else geocodePlaces(places, 0, res, user);
+                if(places.length == 0) {
+                    res.render("users/show", {user: user, places: places});
+                }
+                else {
+                    console.log(places)
+                    
+                    geocodePlaces(places, 0, res, user);
 
+                }
             }
         })
     });
@@ -249,9 +255,8 @@ router.get("/users/:id", middleware.isLoggedIn, (req, res) => {
 function geocodePlaces(geoPlaces, i, res, user) {
     geocoder.geocode({ googlePlaceId: geoPlaces[i].city }, (err, data) => {
         if (!err) {
-            geoPlaces[i].city = data[0].formattedAddress;
+            geoPlaces[i].cityName = data[0].formattedAddress;
         } else {
-            geoPlaces[i].city = geoPlaces[i].city;
             console.log(err);
         }
 
