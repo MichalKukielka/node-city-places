@@ -257,6 +257,7 @@ function geocodePlaces(geoPlaces, i, res, user) {
         if (!err) {
             geoPlaces[i].cityName = data[0].formattedAddress;
         } else {
+            geoPlaces[i].cityName = "Uknown";
             console.log(err);
         }
 
