@@ -2,7 +2,6 @@ var express    = require("express"),
     router     = express.Router(),
     middleware = require('../middleware/index'),
     Place      = require("../models/place"),
-    Comment    = require("../models/comment");
     Rating    = require("../models/rating");
     ObjectId = require('mongodb').ObjectID;
 
@@ -20,7 +19,7 @@ router.get("/:city/places/:id/rating", function (req, res) {
 
 router.get("/:city/places/:id/avgRating", function (req, res) {
     Rating.aggregate([
-        {"$match": { "place": ObjectId(req.params.id)}},
+        {$match: { "place": ObjectId(req.params.id)}},
         {$group: {_id: "$place", avg: {$avg: "$rating"}, count: {$sum: 1}}}
     ]).then(function(result) {
         Place.findByIdAndUpdate(req.params.id, { ratingsAvg: Math.round(result[0].avg * 100)/100,
@@ -34,8 +33,6 @@ router.get("/:city/places/:id/avgRating", function (req, res) {
 });
 
 router.post("/:city/places/:id/setRating", (req, res) => {
-    console.log(req.query);
-    var city = req.params.city;
     Place.findById(req.params.id).populate("ratings").exec(function (err, place) {
         if (err) {
             console.log(err);

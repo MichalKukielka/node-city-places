@@ -6,21 +6,7 @@ var express    = require("express"),
     Rating    = require("../models/rating");
     ObjectId = require('mongodb').ObjectID;
 
-
-router.get("/:city/places/:id/comments/new", middleware.isLoggedIn, (req, res) => {
-
-    Place.findById(req.params.id, function (err, place) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            res.render("comments/new", { place: place, currentUser: req.user });
-        }
-    });
-});
-
 router.get("/:city/places/:id/comments", function (req, res) {
-
 
     Place.findById(req.params.id).populate("comments").exec(function(err, place){
         if(err){
@@ -28,35 +14,6 @@ router.get("/:city/places/:id/comments", function (req, res) {
         }
         else{
             res.render("comments/commentsSection",{ place: place, currentUser: req.user });
-        }
-    });
-
-
-});
-
-router.post("/:city/places/:id/newComment", (req, res) => {
-    var city = req.params.city;
-    Place.findById(req.params.id, function (err, place) {
-        if (err) {
-            console.log(err);
-            req.flash("error", "Something went wrong.");
-            res.redirect("/:city/places");
-        }
-        else {
-            Comment.create(req.body.comment, function (err, comment) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    comment.author.id = req.user._id;
-                    comment.author.username = req.user.username;
-                    comment.save();
-                    place.comments.push(comment);
-                    place.save();
-                    req.flash("success", "Successfully added comment.");
-                    res.sendStatus(200);
-                }
-            });
         }
     });
 });
@@ -87,17 +44,32 @@ router.post("/:city/places/:id/comments", middleware.isLoggedIn, (req, res) => {
     });
 });
 
-router.get("/:city/places/:id/comments/:comment_id/edit", middleware.checkCommentOwnership,  (req, res) => {
-            
-    Comment.findById(req.params.comment_id, function(err, comment){
+router.post("/:city/places/:id/newComment", middleware.isLoggedIn, (req, res) => {
+    var city = req.params.city;
+    Place.findById(req.params.id, function (err, place) {
         if (err) {
             console.log(err);
-            res.redirect( "/" + req.params.city + "/places/" + id);
-        } else {
-            res.render('comments/edit', {city: req.params.city, id: req.params.id, comment:comment})
+            req.flash("error", "Something went wrong.");
+            res.redirect("/:city/places");
+        }
+        else {
+            Comment.create(req.body.comment, function (err, comment) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    console.log("ASS");
+                    comment.author.id = req.user._id;
+                    comment.author.username = req.user.username;
+                    comment.save();
+                    place.comments.push(comment);
+                    place.save();
+                    req.flash("success", "Successfully added comment.");
+                    res.sendStatus(200);
+                }
+            });
         }
     });
-
 });
 
 router.put("/:city/places/:id/comments/:comment_id", middleware.checkCommentOwnership,  (req, res) => {
@@ -125,34 +97,6 @@ router.delete("/:city/places/:id/comments/:comment_id", middleware.checkCommentO
         }
     });
 
-});
-
-router.post("/:city/places/:id/newComment", middleware.isLoggedIn, (req, res) => {
-    var city = req.params.city;
-    Place.findById(req.params.id, function (err, place) {
-        if (err) {
-            console.log(err);
-            req.flash("error", "Something went wrong.");
-            res.redirect("/:city/places");
-        }
-        else {
-            Comment.create(req.body.comment, function (err, comment) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.log("ASS");
-                    comment.author.id = req.user._id;
-                    comment.author.username = req.user.username;
-                    comment.save();
-                    place.comments.push(comment);
-                    place.save();
-                    req.flash("success", "Successfully added comment.");
-                    res.sendStatus(200);
-                }
-            });
-        }
-    });
 });
 
 module.exports = router

@@ -61,9 +61,6 @@ router.get("/:city/places/getPlaces", (req, res) => {
         delete filterObj.category; 
     }
 
-    
-    console.log(req.query.popularity)
-
     Place.find(filterObj, function(err, places){
         if(err){
             console.log(err);
@@ -165,16 +162,9 @@ router.post("/:city/places", middleware.isLoggedIn, upload.single('image'), (req
                     category: category
                 };
 
-                console.log('Czy')
-
                 cloudinary.v2.uploader.upload(req.file.path,function(error, result) { 
-                    console.log('wchodzi wgl')
-
                     // add cloudinary url for the image to the campground object under image property
                     newPlace.image = result.secure_url;
-                    
-                    console.log('tutaj wgl')
-
                     Place.create(newPlace, function(err, place){
                         if(err){
                             console.log(err);
@@ -200,44 +190,28 @@ router.get("/:city/places/new", middleware.isLoggedIn, (req, res) => {
     res.render("places/new", {city:city, cityCap: cityCap});
 });
 
-router.get("/:city/places/:id", function(req, res){
+router.get("/:city/places/:id", middleware.doLogin, function(req, res){
 
-    var doLogin = req.query.login;
-    if(doLogin == "true") {
-        const url = require('url');
-        req.session.redirectUrl = url.parse(req.url).pathname;
-        res.redirect('/login');
-    }else{
+    var city = req.params.city;
 
-        var doLogin = req.query.login;
-        if(doLogin == "true") {
-            const url = require('url');
-            req.session.redirectUrl = url.parse(req.url).pathname;
-            res.redirect('/login');
-        }else{
-
-            var city = req.params.city;
-
-            geocoder.geocode({googlePlaceId: city}, function(err, geores) {
-                if(!err) {
-                    var cityTitle = geores[0].city;
-                    Place.findById(req.params.id).populate("comments").exec(function(err, place){
-                        if(err){
-                            console.log(err);
-                        }
-                        else{
-                            res.render("places/show", {place: place, cityTitle: cityTitle});
-                        }
-                    });
-                }else{
-                    console.log(err)
-                    res.sendStatus(400);
+    geocoder.geocode({googlePlaceId: city}, function(err, geores) {
+        if(!err) {
+            var cityTitle = geores[0].city;
+            Place.findById(req.params.id).populate("comments").exec(function(err, place){
+                if(err){
+                    console.log(err);
+                }
+                else{
+                    res.render("places/show", {place: place, cityTitle: cityTitle});
                 }
             });
+        }else{
+            console.log(err)
+            res.sendStatus(400);
         }
-    }
-});
+    });
 
+});
 
 // EDIT PLACE ROUTE
 router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, (req, res) => {
@@ -249,9 +223,7 @@ router.get("/:city/places/:id/edit", middleware.checkPlaceOwnership, (req, res) 
         } else {
             res.render("places/edit", {place: place});
         }
-
     });
-
 });
 
 // UPDATE PLACE ROUTE
@@ -293,28 +265,6 @@ router.put("/:city/places/:id", middleware.checkPlaceOwnership, upload.single('i
 
 });
 
-router.put("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {
-
-    geocoder.geocode(req.body.location, function (err, data) {
-        if (err || !data.length) {
-            req.flash('error', 'Invalid address.');
-            return res.redirect('back');
-        }
-        req.body.place.lat = data[0].latitude;
-        req.body.place.lng = data[0].longitude;
-        req.body.place.location = data[0].formattedAddress;
-    
-        Place.findByIdAndUpdate(req.params.id, req.body.place, function(err, updatedPlace){
-            if(err){
-                req.flash("error", err.message + ".");
-                res.redirect("back");
-            } else {
-                req.flash("success","Successfully Updated!");
-                res.redirect("/" + updatedPlace.city + "/places/" + updatedPlace._id);
-            }
-        });
-    });
-});
 
 // DESTROY PLACE ROUTE
 router.delete("/:city/places/:id", middleware.checkPlaceOwnership, (req, res) => {

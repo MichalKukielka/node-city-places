@@ -30,7 +30,6 @@ router.post("/", (req, res) => {
             req.flash("error", "City not found");
             res.redirect("/");
         } else {
-            console.log(data);
             res.redirect("/" + data[0].extra.googlePlaceId + "/places");
         }
     });
@@ -134,18 +133,17 @@ router.post("/password/reset", (req, res, next) => {
             var smtpTransport = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
-                    user: 'aghwowlegion@gmail.com',
+                    user: 'cityplacespaw@gmail.com',
                     pass: process.env.GMAILPW
                 }
             });
             var mailOptions = {
                 to: user.email,
-                from: 'aghwowlegion@gmail.com',
+                from: 'cityplacespaw@gmail.com',
                 subject: 'CityPlaces - reset password',
                 text: 'http://' + req.headers.host + '/password/reset/' + token
             };
             smtpTransport.sendMail(mailOptions, function (err) {
-                console.log('Mail sent!')
                 req.flash("success", "An email has been sent to " + user.email + ' with further instructions.');
                 done(err, 'done');
             });
@@ -202,13 +200,13 @@ router.post("/password/reset/:token", (req, res) => {
             var smtpTransport = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
-                    user: 'aghwowlegion@gmail.com',
+                    user: 'cityplacespaw@gmail.com',
                     pass: process.env.GMAILPW
                 }
             });
             var mailOptions = {
                 to: user.email,
-                from: 'aghwowlegion@gmail.com',
+                from: 'cityplacespaw@gmail.com',
                 subject: 'CityPlaces - your password has been changed',
                 text: 'Confirmation message: ' + user.email
             };

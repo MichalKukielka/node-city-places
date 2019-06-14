@@ -41,6 +41,15 @@ middlewareObj.isLoggedIn = function(req, res, next) {
     res.redirect("/login");
 };
 
+middlewareObj.doLogin = function(req, res, next) {
+    if(req.query.login){
+        const url = require('url');
+        req.session.redirectUrl = url.parse(req.url).pathname;
+        res.redirect('/login');
+    }else{
+        next();
+    }
+};
 
 middlewareObj.checkCommentOwnership = function(req, res, next){
 
