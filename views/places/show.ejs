@@ -30,19 +30,19 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-3 rounded" style="background-color: rgb(77, 77, 77); color: white;">
+                                <div class="col-md-3 rounded bg-light" >
                                     <div id="rateField" class="m-1 text-center">
                                         <div id="rateNum" style="font-size:24px;display: inline-block;"></div> <div id="numVotes" style="font-size:12px;display: inline-block;"></div>
                                     </div>      
                                     <div id="noVotes" class="m-1 text-center">
                                         <i>No votes yet</i>
                                     </div>
-                                    <div class="mb-2 rounded text-center" style="background-color: rgb(102, 102, 102);">
+                                    <div class="mb-2 rounded text-center bg-white">
                                         <% if(currentUser) { %>
                                         Your vote:
                                         <div class="my-rating mb-1" id="ratingStars"></div>
                                         <% }else{ %>
-                                            <button type="button" class="btn btn-link btn-sm text-light" onclick="login()">Login to vote</button>
+                                            <button type="button" class="btn btn-link btn-sm text-dark" onclick="login()">Login to vote</button>
                                         <% } %>
                                     </div>
                                 </div>
@@ -86,7 +86,7 @@
     <script>
 
         function login() {
-            console.log(window.location.href + "?login=true");
+            window.location.replace(window.location.href + "?login=true");
         }
 
         function editComment(commentID) {
@@ -153,7 +153,7 @@
                     if(data.length > 0) {
                         $('#rateField').show();
                         $('#noVotes').hide();
-                        document.getElementById("rateNum").innerHTML = Math.round(data[0].avg*100)/100 + ' <span style="color:yellow">&#9733;</span>';
+                        document.getElementById("rateNum").innerHTML = Math.round(data[0].avg*100)/100 + ' <span style="color:orange">&#9733;</span>';
                         document.getElementById("numVotes").innerHTML = '/ ' +  data[0].count + (data[0].count == 1 ? 'vote' : ' votes');
                     } else {
                         $('#rateField').hide();
@@ -161,10 +161,6 @@
                     }
                 }
             });
-        }
-
-        function setRating(rating) {
-            $(".my-rating").starRating('setRating', rating);
         }
 
         function loadComments() {
@@ -244,33 +240,33 @@
             getAvgRating();
         }
 
-                    function initMap() {
-                        var lat = <%= place.lat %>;
-                        var lng = <%= place.lng %>;
-                        var center = {lat: lat, lng: lng };
-                        var map = new google.maps.Map(document.getElementById('map'), {
-                            zoom: 13,
-                            center: center,
-                            scrollwheel: false
-                        });
-                        var contentString = `
-                        <strong><%= place.name %><br />
-                        <%= place.location %></strong>
-                        <p><%= place.description %></p>
-                        `
-                        var infowindow = new google.maps.InfoWindow({
-                        content: contentString
-                        });
-                        var marker = new google.maps.Marker({
-                            position: center,
-                            map: map
-                        });
-                        marker.addListener('click', function() {
-                        infowindow.open(map, marker);
-                        });
-                    }
-                </script>
-                <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
-                <script type="text/javascript">webpageReady();</script>
+        function initMap() {
+            var lat = <%= place.lat %>;
+            var lng = <%= place.lng %>;
+            var center = {lat: lat, lng: lng };
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: center,
+                scrollwheel: false
+            });
+            var contentString = `
+            <strong><%= place.name %><br />
+            <%= place.location %></strong>
+            <p><%= place.description %></p>
+            `
+            var infowindow = new google.maps.InfoWindow({
+            content: contentString
+            });
+            var marker = new google.maps.Marker({
+                position: center,
+                map: map
+            });
+            marker.addListener('click', function() {
+            infowindow.open(map, marker);
+            });
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7GHMZ7MeeFSnfM58toFjGty4DlEhtBQU&callback=initMap"></script>
+    <script type="text/javascript">webpageReady();</script>
 
 <% include ../partials/footer %>

@@ -1,14 +1,17 @@
 
 <% if(places && places.length > 0) { %>
+
         <style>
-        .fit-image{
-width: 100%;
-object-fit: cover;
-height: 220px; /* only if you want fixed height */
-}
-    
+            
+            .fit-image{
+                width: 100%;
+                object-fit: cover;
+                height: 220px;
+            }
             
         </style>
+
+
         <div class="row text-center">
         <% places.forEach(function(place){ %>
             <div class="col-md-4 col-sm-6">
@@ -23,7 +26,7 @@ height: 220px; /* only if you want fixed height */
                         <div class="card-footer bg-light text-muted pb-0 pt-0">
                             
                             <% if(place.ratingsCount != undefined) { %>
-                                <p class=" small mb-0"><%= place.ratingsAvg %> <span style="color:black">&#9733;</span> / <%= place.ratingsCount %>
+                                <p class=" small mb-0"><%= place.ratingsAvg %> <span style="color:orange">&#9733;</span> / <%= place.ratingsCount %>
                                     <% if(place.ratingsCount == 1) { %>
                                         vote
                                     <% } else { %>
@@ -45,5 +48,16 @@ height: 220px; /* only if you want fixed height */
 
     </div>
 
-<% } %>
+<% } else { %>
 
+    <div id="landing-header2" class="justify-content-center">
+    <div class="card mx-auto" style="width:400px; background-color:rgba(255,255,255,0.85);">
+        <div class="card-body">
+
+            <h3 class="pb-1`">No places found 💩</h3>
+
+        </div>
+    </div>
+    </div>
+
+<% } %>

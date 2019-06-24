@@ -1,14 +1,15 @@
 require('dotenv').config();
 
-const express        = require("express"),
-    app            = express(),
-    bodyParser     = require("body-parser"),
-    mongoose       = require("mongoose"),
-    passport       = require("passport"),
-    localStrategy  = require("passport-local"),
-    methodOverride = require("method-override"),
-    flash          = require("connect-flash"),
-    User           = require("./models/user");
+const   express        = require("express"),
+        favicon        = require('serve-favicon'),
+        app            = express(),
+        bodyParser     = require("body-parser"),
+        mongoose       = require("mongoose"),
+        passport       = require("passport"),
+        localStrategy  = require("passport-local"),
+        methodOverride = require("method-override"),
+        flash          = require("connect-flash"),
+        User           = require("./models/user");
 
 
 const placeRoutes    = require("./routes/places"),
@@ -21,12 +22,14 @@ mongoose.connect( db, { useNewUrlParser: true })
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 
+
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 app.use(flash());
-
+app.use(favicon(__dirname + '/public/images/location.png'))
+console.log(__dirname + '/public/images/location.png')
 app.use(require("express-session")({
     secret: "vfdsagjadfklgvadsfgbadfbdvpjmgbvzcjnxm`;Di3243tgqsradv90zhione;jkfavxc",
     resave: false,
