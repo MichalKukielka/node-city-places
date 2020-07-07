@@ -23,7 +23,7 @@
     "node-loader": "^0.6.0",
     "nodemailer": "^5.1.1",
     "nodemon": "^1.18.9",
-    "npm": "^6.5.0",
+    "npm": "^6.14.6",
     "octicons": "^8.4.1",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
